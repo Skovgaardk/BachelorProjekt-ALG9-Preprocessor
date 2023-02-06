@@ -34,60 +34,49 @@ def plotTest():
     df_world.plot()
 
 
+def findNode(ref, root):
+    for child in root:
+        if child.tag == 'node':
+            if child.attrib['id'] == ref:
+                return child.attrib['id'], child.attrib['lat'], child.attrib['lon']
+
 
 if __name__ == '__main__':
-    tree = ET.parse('Data/malta-latest.osm')
+    tree = ET.parse('Data/map_2.osm')
     root = tree.getroot()
 
     graph = Util.Graph()
 
-    # for node in root.findall('./node'):
-    #     if node.find('tag[@k="highway"]') is not None:
-    #         graph.addNode(node)
-    #
-    # for way in root.findall('./way'):
-    #     if way.find('tag[@k="highway"]') is not None:
-    #         for nd in way.findall('./nd'):
-    #             graph.addEdge(way[0].attrib['ref'], nd.attrib['ref'])
-
+    ##Her går vi ind og finder alle noder som ligger på en way med tag highway
     for child in root:
-        if child.tag == 'node':
-            for tag in child:
-                if tag.attrib['k'] == 'highway':
-                    graph.addNode(child)
-                    break
         if child.tag == 'way':
-            for tag in child:
-                try:
-                    if tag.attrib['k'] == 'highway':
-                        for child2 in child.findall('./nd'):
-                            print("Found way with highway tag, printing refs")
-                            print("Child id: " + child.attrib['id'])
-                            childId = child.attrib['id']
-                            refcount = 0
-                            ## Iterate over attributes of refs
-                            for etELlerAndet in child.findall('./nd'):
-                                print("Reference number: " + str(refcount) + " ref: " + etELlerAndet.attrib['ref'])
-                                print("Adding edge from " + child.attrib['id'] + " to " + etELlerAndet.attrib['ref'])
-                                graph.addEdge(child, etELlerAndet)
-                                refcount += 1
-
-
-                            # for etELlerAndet in child:
-                            #     print("Reference number: " + str(refcount) + " ref: " + etELlerAndet.attrib['ref'])
-                            #     print("Adding edge from " + child.attrib['id'] + " to " + etELlerAndet.attrib['ref'])
-                            #     graph.addEdge(child, etELlerAndet)
-                            #     refcount += 1
-
-                        break
-                except KeyError:
-                    pass
-
-    for node in graph.getNodes():
-        print(node, graph.getNode(node).adjacent)
+            if child.find('./tag[@k="highway"]') is not None:
+                #print("Number of references: " + str(len(child.find('/tag[@k="highway"]'))))
+                refCount = 0
+                numOfRefs = len(child.findall('./nd'))
+                prevId = prevLat = prevLon = None
+                for index, ng in enumerate(child.findall('./nd')):
+                    id, lat, lon = findNode(ng.attrib['ref'], root)
+                    graph.addNode(id, lat, lon)
+                    # Alt større end nul og mindre end numOfRefs tilføjer sig selv til listen af noder og sætter sig selv ind i prev, og sætter prev til sig selv
+                    if 0 < index < numOfRefs:
+                        graph.addEdge(prevId, prevLat, prevLon, ng.attrib['ref'], lat, lon)
+                        graph.addEdge(ng.attrib['ref'], lat, lon, prevId, prevLat, prevLon)
+                    prevId = ng.attrib['ref']
+                    prevLat = lat
+                    prevLon = lon
+                    refCount += 1
 
 
 
+
+
+
+    ##Print every node in graph and its adjacent nodes
+    for node in graph.nodeList:
+        print("Node id", node, "has adjacent nodes with ID: ", )
+
+    print("test print: ", graph.getNode('6996546298'))
 
 
 

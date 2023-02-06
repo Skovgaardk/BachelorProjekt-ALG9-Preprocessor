@@ -1,10 +1,10 @@
 
 
 class Node:
-    def __init__(self, node):
-        self.id = node.attrib['id']
-        self.lat = node.attrib['lat']
-        self.lon = node.attrib['lon']
+    def __init__(self, id, lat, lon):
+        self.id = id
+        self.lat = lat
+        self.lon = lon
         self.adjacent = {}
         self.distance = 0
         self.visited = False
@@ -12,8 +12,8 @@ class Node:
         self.priority = 0
         self.heuristic = 0
 
-    def addNeighbor(self, neighbor, weight=0):
-        self.adjacent[neighbor] = weight
+    def addNeighbor(self, id, weight=0):
+        self.adjacent[id] = weight
 
     def getNeighbors(self):
         return self.adjacent.keys()
@@ -26,10 +26,12 @@ class Graph:
         self.nodeList = {}
         self.numNodes = 0
 
-    def addNode(self, node):
+    def addNode(self, id, lat, lon):
+        if id in self.nodeList:
+            return self.nodeList[id]
         self.numNodes = self.numNodes + 1
-        newNode = Node(node)
-        self.nodeList[node.attrib['id']] = newNode
+        newNode = Node(id, lat, lon)
+        self.nodeList[id] = newNode
         return newNode
 
     def getNode(self, n):
@@ -38,13 +40,13 @@ class Graph:
         else:
             return None
 
-    def addEdge(self, frm, to, cost=0):
-        if frm not in self.nodeList:
-            self.addNode(frm)
-        if to not in self.nodeList:
-            self.addNode(to)
+    def addEdge(self, fromId, fromlat, fromlon, toid, tolat, tolon, cost=0):
+        if fromId not in self.nodeList:
+            self.addNode(fromId, fromlat, fromlon)
+        if toid not in self.nodeList:
+            self.addNode(toid, tolat, tolon)
 
-        self.nodeList[frm].addNeighbor(self.nodeList[to], cost)
+        self.nodeList[fromId].addNeighbor(self.nodeList[toid], cost)
 
     def getNodes(self):
         return self.nodeList.keys()
