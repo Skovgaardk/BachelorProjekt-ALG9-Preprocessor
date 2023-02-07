@@ -7,7 +7,8 @@ def findNode(ref, root):
     for child in root:
         if child.tag == 'node':
             if child.attrib['id'] == ref:
-                return child.attrib['id'], child.attrib['lat'], child.attrib['lon']
+                return child.attrib['id'], float(child.attrib['lat']), float(child.attrib['lon'])
+
 
 def printGraph(graph):
     for node in graph.nodeList:
@@ -36,11 +37,11 @@ if __name__ == '__main__':
 
     graph = Util.Graph()
 
-    ##Her går vi ind og finder alle noder som ligger på en way med tag highway
+    # Her går vi ind og finder alle noder som ligger på en way med tag highway
     for child in root:
         if child.tag == 'way':
             if child.find('./tag[@k="highway"]') is not None:
-                #print("Number of references: " + str(len(child.find('/tag[@k="highway"]'))))
+                # print("Number of references: " + str(len(child.find('/tag[@k="highway"]'))))
                 refCount = 0
                 numOfRefs = len(child.findall('./nd'))
                 prevId = prevLat = prevLon = None

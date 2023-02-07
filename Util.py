@@ -1,3 +1,4 @@
+import math
 
 
 class Node:
@@ -26,6 +27,7 @@ class Node:
 
     def __str__(self):
         return str(self.id) + ' adjacent: ' + str([x.id for x in self.adjacent])
+
 
 class Graph:
     def __init__(self):
