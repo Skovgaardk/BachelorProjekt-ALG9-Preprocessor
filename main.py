@@ -1,7 +1,10 @@
 import pickle
 import xml.etree.ElementTree as ET
+
+import mplleaflet
 import networkx as nx
 from matplotlib import pyplot as plt
+import osmnx as ox
 import Util
 
 
@@ -89,6 +92,27 @@ def loadGraph(filename):
     print("Graph loaded from file: " + filename)
     return graph
 
+def createAndPrintNetworkxGraph(graph):
+    G = nx.Graph()
+
+    for node in graph.nodeList:
+        G.add_node(node, pos=(graph.getNode(node).getLatLon()))
+        neighbors = graph.getNode(node).getNeighbors()
+        for neighbor in neighbors:
+            G.add_edge(node, neighbor.getId(), weight=graph.getWeight(node, neighbor.getId()))
+
+    #Make the networkx graph into a matplotlib plot
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    nx.draw(G, ax=ax, with_labels=True, node_size=10, node_color='b', edge_color='r', width=0.5)
+
+    #Make a leaflet map from the matplotlib plot
+    mplleaflet.show(fig=fig)
+
+
+
+
+
 
 
 if __name__ == '__main__':
@@ -98,22 +122,35 @@ if __name__ == '__main__':
 
     #saveGraph(DiGraph, 'data/graph_2.pickle')
 
-    DiGraph = loadGraph('data/graph_2.pickle')
-
-    printDiGraph(DiGraph)
+    graph = loadGraph('data/graph_2.pickle')
 
     ## Converter vores DiGraph til en networkx DiGraph
-    G = nx.DiGraph()
-    for node in DiGraph.nodeList:
-        G.add_node(node, pos=(DiGraph.getNode(node).getLatLon()))
-        neighbors = DiGraph.getNode(node).getNeighbors()
-        for neighbor in neighbors:
-            G.add_edge(node, neighbor.getId(), weight=DiGraph.getWeight(node, neighbor.getId()))
 
-    ## Plotter vores DiGraph
-    nx.draw_networkx(G, pos=nx.get_node_attributes(G, 'pos'), with_labels=False, node_size=1, width=0.5, arrowsize=0.5, edge_color='black')
-    plt.show()
+    #createAndPrintNetworkxGraph(graph)
 
+    # Convert Digraph to networkx graph
+    #G = nx.MultiDiGraph()
+    G = ox.graph_from_xml('data/map_2.osm')
+
+
+    #for node in graph.nodeList:
+    #    G.add_node(node, pos=(graph.getNode(node).getLatLon()))
+    #    neighbors = graph.getNode(node).getNeighbors()
+    #    for neighbor in neighbors:
+    #        G.add_edge(node, neighbor.getId(), weight=graph.getWeight(node, neighbor.getId()))
+
+
+    # Convert networkx graph to GeoPandas GeoDataFrame
+
+    gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
+    G = ox.graph_from_gdfs(gdf_nodes, gdf_edges, graph_attrs=G.graph)
+
+    fig, ax = ox.plot_graph(G, node_size=1, node_zorder=3, edge_linewidth=0.5, edge_color='white', show=False, close=False)
+    fig.show()
+
+    # Plot the GeoDataFrame
+    #fig, ax = ox.plot_graph(gdf, node_size=0, edge_linewidth=0.5, edge_color='black', show=False, close=False)
+    #plt.show()
 
 
 

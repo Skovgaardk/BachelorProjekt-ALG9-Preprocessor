@@ -22,5 +22,6 @@ Pedestrian, Access*, Busway, (Escape mby), Bus_guideway, footway, bridleway, cor
 
 
 
-hvad vi kiggede på sidst:
-    Der er en fejl ved9 1559838261, da vi rammer en node der har 3 edges, men ligger i midten af en ref liste.
+Hvad vi skal lave onsdag:
+    - Få lavet xml filen om til en ny xml fil, hvor vi har fjernet alle de ting som ikke skal med.
+    - Få lavet en graf ud fra den nye xml fil.
