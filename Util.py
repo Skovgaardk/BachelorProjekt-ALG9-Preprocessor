@@ -1,4 +1,5 @@
 import math
+import time
 
 
 class Node:
@@ -68,7 +69,6 @@ class DiGraph:
         self.nodeList = graph.nodeList
         self.numNodes = graph.numNodes
         self.calculateWeights()
-        self.removeUnnecessaryEdges()
 
     def getNodes(self):
         return self.nodeList.keys()
@@ -94,33 +94,6 @@ class DiGraph:
                 nodeLat, nodeLon = self.nodeList[node].getLatLon()
                 distance = self.calculateDistance(nodeLat, nodeLon, neighborLat, neighborLon)
                 self.nodeList[node].adjacent[neighbor] = distance
-
-    def removeUnnecessaryEdges(self):
-        # Traverse the chain of nodes from the node with one neighbor untill a node with more than two neighbor is found
-        # Store the weights of all the edges in the chain, and add them to the first node in the chain
-        # Repeat for all chains of nodes with one neighbor
-        def remove_chain(node):
-            weight = 0
-            while len(node.getNeighbors()) == 1:
-                neighbor = list(node.getNeighbors())[0]
-                weight += node.adjacent[neighbor]
-                self.nodeList.pop(node.getId())
-                print("Removed node: " + str(node.getId()))
-                for n in self.nodeList.values():
-                    if neighbor in n.getNeighbors():
-                        n.adjacent.pop(neighbor)
-                node = neighbor
-
-            return node, weight
-
-        while True:
-            nodeWithChains = [node for node in self.nodeList.values() if len(node.getNeighbors()) == 1]
-            if len(nodeWithChains) == 0:
-                break
-            for node in nodeWithChains:
-                endOfChain, weight = remove_chain(node)
-                if endOfChain in self.nodeList:
-                    self.nodeList[node].addNeighbor(endOfChain, weight)
 
 
 

@@ -1,4 +1,7 @@
 import xml.etree.ElementTree as ET
+import networkx as nx
+import osmnx as ox
+from matplotlib import pyplot as plt
 
 import Util
 
@@ -19,16 +22,15 @@ def printGraph(graph):
         print("Node id", node, "has adjacent nodes with ID: ", neighborIds)
 
 
-def printDiGraph(graph):
-    diGraph = Util.DiGraph(graph)
-
+def printDiGraph(diGraph):
     for node in diGraph.nodeList:
         neighbors = diGraph.getNode(node).getNeighbors()
         # Prints the id of the node and the id of the adjacent nodes with its corresponding weight
+        lat, lon = diGraph.getNode(node).getLatLon()
+        print("Node id", node, "with latlon: ", lat, lon,  " and has adjacent nodes with ID: ")
         for neighbor in neighbors:
-            neighborIds = []
-            neighborIds.append(neighbor.getId())
-            print("Node id", node, "has adjacent nodes with ID: ", neighborIds, "and weight: ", diGraph.getNode(node).adjacent[neighbor])
+            neighborIds = [neighbor.getId()]
+            print(neighborIds, "with weight: ", diGraph.getWeight(node, neighbor.getId()))
 
 
 if __name__ == '__main__':
@@ -51,6 +53,8 @@ if __name__ == '__main__':
                     isMotorWay = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'motorway'
                     isRoundAbout = child.find('./tag[@k="junction"]') is not None and child.find('./tag[@k="junction"]').attrib['v'] == 'roundabout'
                     isDriveWay = child.find('./tag[@k="service"]') is not None and child.find('./tag[@k="service"]').attrib['v'] == 'driveway'
+                    if isDriveWay:
+                        continue
                     if isOneway or isMotorWay or isRoundAbout or isDriveWay:
                         id, lat, lon = findNode(ng.attrib['ref'], root)
                         graph.addNode(id, lat, lon)
@@ -73,4 +77,22 @@ if __name__ == '__main__':
                         prevLon = lon
                         refCount += 1
 
-    printDiGraph(graph)
+    DiGraph = Util.DiGraph(graph)
+    printDiGraph(DiGraph)
+
+    ## Converter vores DiGraph til en networkx DiGraph
+    G = nx.DiGraph()
+    for node in DiGraph.nodeList:
+        G.add_node(node, pos=(DiGraph.getNode(node).getLatLon()))
+        neighbors = DiGraph.getNode(node).getNeighbors()
+        for neighbor in neighbors:
+            G.add_edge(node, neighbor.getId(), weight=DiGraph.getWeight(node, neighbor.getId()))
+
+    ## Plotter vores DiGraph
+    nx.draw_networkx(G, pos=nx.get_node_attributes(G, 'pos'), with_labels=False, node_size=1, width=0.5, arrowsize=0.5, edge_color='black')
+
+
+
+
+
+
