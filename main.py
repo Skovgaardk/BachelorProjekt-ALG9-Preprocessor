@@ -79,6 +79,12 @@ def parseXml(filename):
                         refCount += 1
     return graph
 
+def saveGraphToXml(graph, filename):
+
+
+def loadGraphFromXml(filename):
+    return graph
+
 def saveGraph(graph, filename):
     f = open(filename, 'wb')
     pickle.dump(graph, f)
