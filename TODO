@@ -15,8 +15,10 @@ Ting vi har taget hånd om, når vi laver vores noder/Grapher:
 
 - Driveways
 
-Se wiki side for ting vi ikke skal have med:
+Se wiki side for ting vi ikke skal have med (Nok først til malta):
 https://wiki.openstreetmap.org/wiki/Key:highway
+Pedestrian, Access*, Busway, (Escape mby), Bus_guideway, footway, bridleway, corridor, via_ferrata, cycleway, proposed, construction,
+(Har kun skrevet de tags fra highways vi ikke skal have med, vi skal nok også ekskludere tags som alle typer af cycleway)
 
 
 

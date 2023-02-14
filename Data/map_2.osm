@@ -2118,7 +2118,7 @@
   <nd ref="6996546302"/>
   <nd ref="6996546301"/>
   <nd ref="6996546300"/>
-  <tag k="highway" v="service"/>
+      <tag k="highway" v="service"/>
  </way>
  <way id="747822345" visible="true" version="1" changeset="77384479" timestamp="2019-11-21T14:49:44Z" user="Hjart" uid="207581">
   <nd ref="6996546307"/>
