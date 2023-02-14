@@ -1,4 +1,4 @@
-import math
+import numpy as np
 import time
 
 
@@ -83,7 +83,7 @@ class DiGraph:
         return self.nodeList[fromId].adjacent[self.nodeList[toId]]
 
     def calculateDistance(self, lat1, lon1, lat2, lon2):
-        return math.sqrt((lat1 - lat2) ** 2 + (lon1 - lon2) ** 2)
+        return np.sqrt((lat1 - lat2) ** 2 + (lon1 - lon2) ** 2)
 
     def calculateWeights(self):
         for node in self.nodeList:

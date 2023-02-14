@@ -1,8 +1,7 @@
+import pickle
 import xml.etree.ElementTree as ET
 import networkx as nx
-import osmnx as ox
 from matplotlib import pyplot as plt
-
 import Util
 
 
@@ -32,9 +31,8 @@ def printDiGraph(diGraph):
             neighborIds = [neighbor.getId()]
             print(neighborIds, "with weight: ", diGraph.getWeight(node, neighbor.getId()))
 
-
-if __name__ == '__main__':
-    tree = ET.parse('Data/map_2.osm')
+def parseXml(filename):
+    tree = ET.parse(filename)
     root = tree.getroot()
 
     graph = Util.Graph()
@@ -76,8 +74,32 @@ if __name__ == '__main__':
                         prevLat = lat
                         prevLon = lon
                         refCount += 1
+    return graph
 
-    DiGraph = Util.DiGraph(graph)
+def saveGraph(graph, filename):
+    f = open(filename, 'wb')
+    pickle.dump(graph, f)
+    f.close()
+    print("Graph saved to file: " + filename)
+
+def loadGraph(filename):
+    f = open(filename, 'rb')
+    graph = pickle.load(f)
+    f.close()
+    print("Graph loaded from file: " + filename)
+    return graph
+
+
+
+if __name__ == '__main__':
+    #graph = parseXml('data/map_2.osm')
+
+    #DiGraph = Util.DiGraph(graph)
+
+    #saveGraph(DiGraph, 'data/graph_2.pickle')
+
+    DiGraph = loadGraph('data/graph_2.pickle')
+
     printDiGraph(DiGraph)
 
     ## Converter vores DiGraph til en networkx DiGraph
@@ -90,6 +112,7 @@ if __name__ == '__main__':
 
     ## Plotter vores DiGraph
     nx.draw_networkx(G, pos=nx.get_node_attributes(G, 'pos'), with_labels=False, node_size=1, width=0.5, arrowsize=0.5, edge_color='black')
+    plt.show()
 
 
 

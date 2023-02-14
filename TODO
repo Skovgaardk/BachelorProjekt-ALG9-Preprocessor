@@ -21,4 +21,4 @@ https://wiki.openstreetmap.org/wiki/Key:highway
 
 
 hvad vi kiggede på sidst:
-    Der er en fejl ved 961812496 når vi fjerner edges, som vi ikke kan finde ud af.
+    Der er en fejl ved9 1559838261, da vi rammer en node der har 3 edges, men ligger i midten af en ref liste.
