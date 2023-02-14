@@ -4,3 +4,21 @@ Note til selv:
 De der highways med en masse refs, der er alle ref's bare noder der ligger på den vej.
 
 Skal måske finde kryds ved at kigge på veje der har samme noder.
+
+Delete driveways
+
+Ting vi har taget hånd om, når vi laver vores noder/Grapher:
+- Oneway både oneway tag, men også highway/roundabout, ved at tjekke tag, og dens attribut.
+                    isOneway = child.find('./tag[@k="oneway"]') is not None and child.find('./tag[@k="oneway"]').attrib['v'] == 'yes'
+                    isMotorWay = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'motorway'
+                    isRoundAbout = child.find('./tag[@k="junction"]') is not None and child.find('./tag[@k="junction"]').attrib['v'] == 'roundabout'
+
+- Driveways
+
+Se wiki side for ting vi ikke skal have med:
+https://wiki.openstreetmap.org/wiki/Key:highway
+
+
+
+hvad vi kiggede på sidst:
+    Der er en fejl ved 961812496 når vi fjerner edges, som vi ikke kan finde ud af.

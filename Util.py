@@ -1,3 +1,4 @@
+import math
 
 
 class Node:
@@ -18,8 +19,15 @@ class Node:
     def getNeighbors(self):
         return self.adjacent.keys()
 
+    def getId(self):
+        return self.id
+
+    def getLatLon(self):
+        return self.lat, self.lon
+
     def __str__(self):
         return str(self.id) + ' adjacent: ' + str([x.id for x in self.adjacent])
+
 
 class Graph:
     def __init__(self):
@@ -54,5 +62,81 @@ class Graph:
     def __iter__(self):
         return iter(self.nodeList.values())
 
-    def __str__(self):
-        return str(self.nodeList)
+
+class DiGraph:
+    def __init__(self, graph):
+        self.nodeList = graph.nodeList
+        self.numNodes = graph.numNodes
+        self.calculateWeights()
+        self.removeUnnecessaryEdges()
+
+    def getNodes(self):
+        return self.nodeList.keys()
+
+    def getNode(self, n):
+        if n in self.nodeList:
+            return self.nodeList[n]
+        else:
+            return None
+
+    def getWeight(self, fromId, toId):
+        return self.nodeList[fromId].adjacent[self.nodeList[toId]]
+
+    def calculateDistance(self, lat1, lon1, lat2, lon2):
+        return math.sqrt((lat1 - lat2) ** 2 + (lon1 - lon2) ** 2)
+
+    def calculateWeights(self):
+        for node in self.nodeList:
+            neighbors = self.nodeList[node].getNeighbors()
+            # Updates node's adjacent dictionary with distance as weight
+            for neighbor in neighbors:
+                neighborLat, neighborLon = neighbor.getLatLon()
+                nodeLat, nodeLon = self.nodeList[node].getLatLon()
+                distance = self.calculateDistance(nodeLat, nodeLon, neighborLat, neighborLon)
+                self.nodeList[node].adjacent[neighbor] = distance
+
+    def removeUnnecessaryEdges(self):
+        # Traverse the chain of nodes from the node with one neighbor untill a node with more than two neighbor is found
+        # Store the weights of all the edges in the chain, and add them to the first node in the chain
+        # Repeat for all chains of nodes with one neighbor
+        def remove_chain(node):
+            weight = 0
+            while len(node.getNeighbors()) == 1:
+                neighbor = list(node.getNeighbors())[0]
+                weight += node.adjacent[neighbor]
+                self.nodeList.pop(node.getId())
+                print("Removed node: " + str(node.getId()))
+                for n in self.nodeList.values():
+                    if neighbor in n.getNeighbors():
+                        n.adjacent.pop(neighbor)
+                node = neighbor
+
+            return node, weight
+
+        while True:
+            nodeWithChains = [node for node in self.nodeList.values() if len(node.getNeighbors()) == 1]
+            if len(nodeWithChains) == 0:
+                break
+            for node in nodeWithChains:
+                endOfChain, weight = remove_chain(node)
+                if endOfChain in self.nodeList:
+                    self.nodeList[node].addNeighbor(endOfChain, weight)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
