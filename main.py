@@ -1,11 +1,15 @@
+import os.path
 import pickle
+import xml.etree.ElementTree
 import xml.etree.ElementTree as ET
 
 import mplleaflet
 import networkx as nx
+import osmium
 from matplotlib import pyplot as plt
 import osmnx as ox
 import Util
+import XMLhandlers
 
 
 def findNode(ref, root):
@@ -79,12 +83,6 @@ def parseXml(filename):
                         refCount += 1
     return graph
 
-def saveGraphToXml(graph, filename):
-
-
-def loadGraphFromXml(filename):
-    return graph
-
 def saveGraph(graph, filename):
     f = open(filename, 'wb')
     pickle.dump(graph, f)
@@ -116,19 +114,87 @@ def createAndPrintNetworkxGraph(graph):
     mplleaflet.show(fig=fig)
 
 
+def newParseXml(filename):
+    tree = ET.parse(filename)
+    root = tree.getroot()
+
+    graph = Util.Graph()
+
+    for child in root:
+        if child.tag == 'way':
+            refCount = 0
+            numOfRefs = len(child.findall('./nd'))
+            prevId, prevLat, prevLon = None, None, None
+
+            for index, ng in enumerate(child.findall('./nd')):
+                isOneway = child.find('./tag[@k="oneway"]') is not None and child.find('./tag[@k="oneway"]').attrib['v'] == 'yes'
+                isMotorWay = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'motorway'
+                isRoundAbout = child.find('./tag[@k="junction"]') is not None and child.find('./tag[@k="junction"]').attrib['v'] == 'roundabout'
+
+                if isOneway or isMotorWay or isRoundAbout:
+                    id, lat, lon = findNode(ng.attrib['ref'], root)
+                    graph.addNode(id, lat, lon)
+                    if 0 < index < numOfRefs:
+                        graph.addEdge(prevId, prevLat, prevLon, ng.attrib['ref'], lat, lon)
+                    prevId = ng.attrib['ref']
+                    prevLat = lat
+                    prevLon = lon
+                    refCount += 1
+                else:
+                    id, lat, lon = findNode(ng.attrib['ref'], root)
+                    graph.addNode(id, lat, lon)
+                    # Alt større end nul og mindre end numOfRefs tilføjer sig selv til listen af noder og sætter
+                    # sig selv ind i prev, og sætter prev til sig selv
+                    if 0 < index < numOfRefs:
+                        graph.addEdge(prevId, prevLat, prevLon, ng.attrib['ref'], lat, lon)
+                        graph.addEdge(ng.attrib['ref'], lat, lon, prevId, prevLat, prevLon)
+                    prevId = ng.attrib['ref']
+                    prevLat = lat
+                    prevLon = lon
+                    refCount += 1
+
+    return graph
 
 
 
 
 
 if __name__ == '__main__':
+
+    print("Starting program")
+
+    wayHandler = XMLhandlers.StreetHandler()
+    nodeHandler = XMLhandlers.NodeHandler()
+    wayHandler.apply_file('data/map_2.osm')
+    nodeHandler.apply_file('data/map_2.osm')
+
+    if os.path.exists('data/map_2_TEST.osm'):
+        os.remove('data/map_2_TEST.osm')
+
+
+    writer = XMLhandlers.wayWriter('data/map_2_TEST.osm')
+    writer.apply_file('data/map_2.osm')
+
+
+
+    # reader = osmium.io.Reader('data/map_2.osm')
+    # header = reader.header().box()
+
+    #tree = ET.parse('data/map_2.osm')
+
+
+
+
+
+
+
     #graph = parseXml('data/map_2.osm')
 
     #DiGraph = Util.DiGraph(graph)
 
     #saveGraph(DiGraph, 'data/graph_2.pickle')
 
-    graph = loadGraph('data/graph_2.pickle')
+    ##graph = loadGraph('dat    for street in h.streets:
 
     ## Converter vores DiGraph til en networkx DiGraph
 
@@ -136,7 +202,7 @@ if __name__ == '__main__':
 
     # Convert Digraph to networkx graph
     #G = nx.MultiDiGraph()
-    G = ox.graph_from_xml('data/map_2.osm')
+    ##G = ox.graph_from_xml('data/map_2.osm')
 
 
     #for node in graph.nodeList:
@@ -148,11 +214,11 @@ if __name__ == '__main__':
 
     # Convert networkx graph to GeoPandas GeoDataFrame
 
-    gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
-    G = ox.graph_from_gdfs(gdf_nodes, gdf_edges, graph_attrs=G.graph)
+    ##gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
+    ##G = ox.graph_from_gdfs(gdf_nodes, gdf_edges, graph_attrs=G.graph)
 
-    fig, ax = ox.plot_graph(G, node_size=1, node_zorder=3, edge_linewidth=0.5, edge_color='white', show=False, close=False)
-    fig.show()
+    ##fig, ax = ox.plot_graph(G, node_size=1, node_zorder=3, edge_linewidth=0.5, edge_color='white', show=False, close=False)
+    ##fig.show()
 
     # Plot the GeoDataFrame
     #fig, ax = ox.plot_graph(gdf, node_size=0, edge_linewidth=0.5, edge_color='black', show=False, close=False)
