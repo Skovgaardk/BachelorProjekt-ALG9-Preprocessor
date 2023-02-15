@@ -53,14 +53,24 @@ def parseXml(filename):
                 numOfRefs = len(child.findall('./nd'))
                 prevId = prevLat = prevLon = None
                 for index, ng in enumerate(child.findall('./nd')):
-                    # check of road is has k="oneway" v="no"
+                    # check of road only have one direction or is a way not for vehicles
                     isOneway = child.find('./tag[@k="oneway"]') is not None and child.find('./tag[@k="oneway"]').attrib['v'] == 'yes'
                     isMotorWay = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'motorway'
                     isRoundAbout = child.find('./tag[@k="junction"]') is not None and child.find('./tag[@k="junction"]').attrib['v'] == 'roundabout'
                     isDriveWay = child.find('./tag[@k="service"]') is not None and child.find('./tag[@k="service"]').attrib['v'] == 'driveway'
-                    if isDriveWay:
+                    isPedestrian = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'pedestrian'
+                    isBusway = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'busway'
+                    isBusguideway = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'bus_guideway'
+                    isFootway = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'footway'
+                    isBridleway = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'bridleway'
+                    isCorridor = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'corridor'
+                    isViaferrata = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'via_ferrata'
+                    isCycleway = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'cycleway'
+                    isProposed = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'proposed'
+                    isConstruction = child.find('./tag[@k="highway"]') is not None and child.find('./tag[@k="highway"]').attrib['v'] == 'construction'
+                    if isDriveWay or isPedestrian or isBusway or isBusguideway or isFootway or isBridleway or isCorridor or isViaferrata or isCycleway or isProposed or isConstruction:
                         continue
-                    if isOneway or isMotorWay or isRoundAbout or isDriveWay:
+                    if isOneway or isMotorWay or isRoundAbout:
                         id, lat, lon = findNode(ng.attrib['ref'], root)
                         graph.addNode(id, lat, lon)
                         if 0 < index < numOfRefs:
