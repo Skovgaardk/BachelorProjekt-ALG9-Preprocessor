@@ -21,6 +21,6 @@ Pedestrian, Access*, Busway, (Escape mby), Bus_guideway, footway, bridleway, cor
 (Har kun skrevet de tags fra highways vi ikke skal have med, vi skal nok også ekskludere tags som alle typer af cycleway)
 
 
-Hvad vi skal lave onsdag:
-    - Få lavet xml filen om til en ny xml fil, hvor vi har fjernet alle de ting som ikke skal med.
-    - Få lavet en graf ud fra den nye xml fil.
+Backlog:
+    - Tjek om den nye xml fil parser og blir til en korrekt graf
+    - Find en måde at visualisere det på

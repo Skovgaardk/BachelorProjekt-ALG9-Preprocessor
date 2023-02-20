@@ -1,5 +1,6 @@
 import os.path
 import pickle
+import time
 import xml.etree.ElementTree
 import xml.etree.ElementTree as ET
 
@@ -175,6 +176,8 @@ if __name__ == '__main__':
 
     wayHandler = XMLhandlers.StreetHandler()
     nodeHandler = XMLhandlers.NodeHandler()
+    boundsHandler = XMLhandlers.BoxHandler()
+    boundsHandler.apply_file('data/map_2.osm')
     wayHandler.apply_file('data/map_2.osm')
     nodeHandler.apply_file('data/map_2.osm')
 
@@ -184,13 +187,14 @@ if __name__ == '__main__':
 
     writer = XMLhandlers.wayWriter('data/map_2_TEST.osm')
     writer.apply_file('data/map_2.osm')
+    writer.close()
 
+    graph = newParseXml('data/map_2_TEST.osm')
 
+    DiGraph = Util.DiGraph(graph)
 
-    # reader = osmium.io.Reader('data/map_2.osm')
-    # header = reader.header().box()
+    printDiGraph(DiGraph)
 
-    #tree = ET.parse('data/map_2.osm')
 
 
 

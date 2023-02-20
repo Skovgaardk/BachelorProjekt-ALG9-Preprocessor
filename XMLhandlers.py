@@ -1,7 +1,4 @@
 import osmium as osm
-import xml.etree.ElementTree as ET
-
-import osmium.io
 
 ways = []
 refs = []
@@ -50,13 +47,13 @@ class NodeHandler(osm.SimpleHandler):
         if n.id in refs:
             nodes.append(n.id)
 
-class ChangeSetHandler(osm.SimpleHandler):
+class BoxHandler(osm.SimpleHandler):
     def __init__(self):
-        super(ChangeSetHandler, self).__init__()
+        super(BoxHandler, self).__init__()
 
-    def changeset(self, c):
-        print(c.bounds)
-        bounds.append(c.bounds)
+    def box(self, b: osm.osm.Box):
+        print("Found bounding box: " + str(b) )
+        bounds.append(b)
 
 class wayWriter(osm.SimpleHandler):
     # Takes params: filename to write to, list of streets
@@ -77,39 +74,6 @@ class wayWriter(osm.SimpleHandler):
 
     def close(self):
         self.writer.close()
-
-
-
-
-
-
-
-
-
-        # root = ET.Element('osm')
-        # root.set('version', '0.6')
-        # root.set('generator', 'osmium')
-        # for street in self.streets:
-        #     way_elem = ET.SubElement(root, 'way')
-        #     way_elem.set('id', str(street['id']))
-        #
-        #     # tags is of type osmium.osm.TagList
-        #     # convert to list of tuples
-        #     tags = [(tag.k, tag.v) for tag in street['tags']]
-        #
-        #     for key, value in tags:
-        #         tag_elem = ET.SubElement(way_elem, 'tag')
-        #         tag_elem.set('k', key)
-        #         tag_elem.set('v', value)
-        #     for node in street['nodes']:
-        #         nd_elem = ET.SubElement(way_elem, 'nd')
-        #         nd_elem.set('ref', str(node))
-        #
-        # tree = ET.ElementTree(root)
-        # tree.write(self.output_filename)
-
-
-
 
 
 
