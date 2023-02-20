@@ -22,5 +22,4 @@ Pedestrian, Access*, Busway, (Escape mby), Bus_guideway, footway, bridleway, cor
 
 
 Backlog:
-    - Tjek om den nye xml fil parser og blir til en korrekt graf
-    - Find en måde at visualisere det på
+    - Tjek lige at det der tag ting på linje 150-151 virker som det skal

@@ -1,9 +1,8 @@
 import osmium as osm
 
-ways = []
-refs = []
-nodes = []
-bounds = []
+ways = set()
+refs = set()
+nodes = set()
 
 class Handler(osm.SimpleHandler):
     def __init__(self):
@@ -16,28 +15,26 @@ class StreetHandler(osm.SimpleHandler):
 
     # This method finds every highway in the map and adds it to the list of streets
     def way(self, w):
-        if 'highway' in w.tags:
+        if 'highway' not in w.tags:
+            return
 
-            #Check if the street is a driveway
-            isDriveway = w.tags.get('highway') == 'service' and w.tags.get('service') == 'driveway'
-            isPedestrian = w.tags.get('highway') == 'pedestrian'
-            isBusWay = w.tags.get('highway') == 'busway'
-            isBusGuideway = w.tags.get('highway') == 'bus_guideway'
-            isFootway = w.tags.get('highway') == 'footway'
-            isBridleway = w.tags.get('highway') == 'bridleway'
-            isCorridor = w.tags.get('highway') == 'corridor'
-            isViaFerrata = w.tags.get('highway') == 'via_ferrata'
-            isCycleway = w.tags.get('highway') == 'cycleway'
-            isProposed = w.tags.get('highway') == 'proposed'
-            isConstruction = w.tags.get('highway') == 'construction'
-            notInterested = [isDriveway, isPedestrian, isBusWay, isBusGuideway, isFootway, isBridleway, isCorridor, isViaFerrata, isCycleway, isProposed, isConstruction]
-            if any(notInterested):
-                return
+        highway_set = {
+            'service', 'pedestrian', 'busway', 'bus_guideway', 'footway',
+            'bridleway', 'corridor', 'via_ferrata', 'cycleway', 'proposed',
+            'construction', 'steps', 'escape', 'raceway', 'bus_stop', 'crossing',
+            'elevator', 'emergency_bay', 'emergency_access_point', 'give_way',
+            'phone', 'milestone', 'passing_place', 'platform', 'rest_area',
+            'services', 'speed_camera', 'stop', 'street_lamp', 'toll_gantry',
+            'traffic_mirror', 'traffic_signals', 'trailhead', 'turning_circle',
+            'turningloop'
+        }
 
-            ways.append(w.id)
-            # add refs id's to list
-            for ref in w.nodes:
-                refs.append(ref.ref)
+        if w.tags['highway'] in highway_set:
+            return
+
+        ways.add(w.id)
+        # add refs id's to list
+        refs.update(ref.ref for ref in w.nodes)
 
 class NodeHandler(osm.SimpleHandler):
     def __init__(self):
@@ -45,15 +42,8 @@ class NodeHandler(osm.SimpleHandler):
 
     def node(self, n):
         if n.id in refs:
-            nodes.append(n.id)
-
-class BoxHandler(osm.SimpleHandler):
-    def __init__(self):
-        super(BoxHandler, self).__init__()
-
-    def box(self, b: osm.osm.Box):
-        print("Found bounding box: " + str(b) )
-        bounds.append(b)
+            print("Found node in refs: " + str(n.id))
+            nodes.add(n.id)
 
 class wayWriter(osm.SimpleHandler):
     # Takes params: filename to write to, list of streets
