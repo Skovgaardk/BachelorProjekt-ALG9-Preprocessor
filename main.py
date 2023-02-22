@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 
 import osmnx as ox
 import Util
+import Visualize
 import XMLhandlers
 from ShortestPathAlgos import Dijkstra
 
