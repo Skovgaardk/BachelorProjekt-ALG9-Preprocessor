@@ -9,4 +9,7 @@ Backlog:
     - Kør dijstra lidt mere for at sikre at den virker
     - clean koden lidt op og tilføj eventuel dokumentation (spørg Gerth)
     - implementer de næste algoritmer
-    - Skriv rapport
+    - Skriv rapport:
+        - Pre-processing
+        - Visualization omkring folium
+        - Dijkstra teori og implementation
