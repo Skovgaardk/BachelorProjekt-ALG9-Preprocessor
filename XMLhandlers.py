@@ -26,7 +26,7 @@ class StreetHandler(osm.SimpleHandler):
             'phone', 'milestone', 'passing_place', 'platform', 'rest_area',
             'services', 'speed_camera', 'stop', 'street_lamp', 'toll_gantry',
             'traffic_mirror', 'traffic_signals', 'trailhead', 'turning_circle',
-            'turningloop'
+            'turningloop', 'path'
         }
 
         if w.tags['highway'] in highway_set:
