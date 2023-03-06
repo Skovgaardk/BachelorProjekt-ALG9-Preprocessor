@@ -1,6 +1,6 @@
 import sys
 
-import Util
+import heapq as hq
 
 
 def dijkstra(graph, source, target):
@@ -8,20 +8,19 @@ def dijkstra(graph, source, target):
     initSingleSource(copyOfGraphList, source)
 
     visited = set()
-    while copyOfGraphList:
-        min_node = None
-        for node in copyOfGraphList:
-            if min_node is None:
-                min_node = node
-            elif node.distance < min_node.distance:
-                min_node = node
-        copyOfGraphList.remove(min_node)
-        visited.add(min_node)
 
+    que = [(0, source)]
+    while que:
+        min_dist, min_node = hq.heappop(que)
+        if min_node in visited:
+            continue
+        visited.add(min_node)
+        if min_node == target:
+            break
         for adj, weight in min_node.adjacent.items():
-            if adj not in visited:
-                print("Relaxing node: ", adj.id, " with weight: ", weight)
-                relax(min_node, adj, weight)
+            if adj in visited:
+                continue
+            relax(min_node, adj, weight, que)
 
     path = []
     while target is not None:
@@ -32,12 +31,16 @@ def dijkstra(graph, source, target):
 
 def initSingleSource(graph, source):
     for node in graph:
-        node._distance = sys.maxsize
+        node._distance = float('inf')
         node._previous = None
     source._distance = 0
 
-def relax(min_node, adj, weight):
+def relax(min_node, adj, weight, not_visited):
     new_dist = min_node.distance + weight
     if new_dist < adj.distance:
         adj.distance = new_dist
         adj.previous = min_node
+        hq.heappush(not_visited, (new_dist, adj))
+
+
+

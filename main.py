@@ -139,20 +139,20 @@ if __name__ == '__main__':
 
     printDiGraph(diGraph)
 
-    # path = Dijkstra.dijkstra(diGraph, diGraph.nodeList['9067296420'], diGraph.nodeList['382980629'])
-    # print("Shortest path: ")
-    # pathLatLon = []
-    # for node in path:
-    #     print("Node: ", node.id, " with latlon: ", node.lat, node.lon, " and distance: ", node._distance)
-    #     pathLatLon.append([node.lat, node.lon])
-    #
-    # dist = path[-1]._distance
-    #
-    # print("Weight of path: ", dist)
-    #
-    #
-    # map = Visualize.visualize_shortest_path(pathLatLon)
-    # map.show_in_browser()
+    path = Dijkstra.dijkstra(diGraph, diGraph.nodeList['9067296420'], diGraph.nodeList['382980629'])
+    print("Shortest path: ")
+    pathLatLon = []
+    for node in path:
+        print("Node: ", node.id, " with latlon: ", node.lat, node.lon, " and distance: ", node._distance)
+        pathLatLon.append([node.lat, node.lon])
+
+    dist = path[-1]._distance
+
+    print("Weight of path: ", dist)
+
+
+    map = Visualize.visualize_shortest_path(pathLatLon)
+    map.show_in_browser()
 
 
 
