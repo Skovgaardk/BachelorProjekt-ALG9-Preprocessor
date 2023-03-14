@@ -2,7 +2,7 @@ import unittest
 
 import Util
 from ShortestPathAlgos import Dijkstra
-from Util import Graph, DiGraph
+
 
 
 class DijkstraTest(unittest.TestCase):

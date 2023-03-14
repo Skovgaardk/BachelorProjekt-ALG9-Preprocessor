@@ -1,5 +1,6 @@
 import os.path
 import pickle
+import webbrowser
 import xml.etree.ElementTree as ET
 
 import osmnx as ox
@@ -152,8 +153,9 @@ if __name__ == '__main__':
 
 
     map = Visualize.visualize_shortest_path(pathLatLon)
-    map.show_in_browser()
-
+    map.render()
+    map.save('data/map.html')
+    webbrowser.get('chrome').open('file://' + os.path.realpath('data/map.html'))
 
 
 
