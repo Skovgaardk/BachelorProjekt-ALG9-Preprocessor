@@ -9,9 +9,9 @@ def dijkstra(graph, source, target):
 
     visited = set()
 
-    que = [(0, source)]
-    while que:
-        min_dist, min_node = hq.heappop(que)
+    queue = [(0, source)]
+    while queue:
+        min_dist, min_node = hq.heappop(queue)
         if min_node in visited:
             continue
         visited.add(min_node)
@@ -20,7 +20,7 @@ def dijkstra(graph, source, target):
         for adj, weight in min_node.adjacent.items():
             if adj in visited:
                 continue
-            relax(min_node, adj, weight, que)
+            relax(min_node, adj, weight, queue)
 
     path = []
     while target is not None:
