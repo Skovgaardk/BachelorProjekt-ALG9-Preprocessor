@@ -1,6 +1,3 @@
-
-
-
 """
     A* algorithm som beskrevet i bogen:
     A classic goal-directed shortest path algorithm is A* search. It
