@@ -13,86 +13,85 @@ import heapq as hq
 import random as rand
 from math import sin, cos, sqrt, atan2, radians
 
+import Util
+
+
 def aStar(graph, source, target):
     # Initialiserer alle nodene i grafen
     copyOfGraphList = list(graph.nodeList.values())
 
     initSingleSource(copyOfGraphList, source)
 
-
-
-
     # Calculate heuristic distance of start vertex to destination vertex
-    HeuristicDist = calculateHeristicDistAsGrid(source, target)
+    heuristicDist = calculateHeristicDistAsGrid(source, target)
 
     # Calculate f value for start vertex(f = g + h) hvor g = 0. f = 167
 
-    openList = [(0, source)]
-    closedList = [(0, target)]
+    openList = [(heuristicDist, 0, source)]
+    openListSetId = set()
+    openListSetId.add(source.id)
+    closedList = [(0, 0, target)]
+    closedListSetId = set()
+    closedListSetId.add(target.id)
 
     # While current vertex is not the destination vertex
-    while openList:
-        print("openList: ", openList)
-        smallestF, current = hq.heappop(openList)
+    iteration = 0
+    while True:
 
-        if current == target:
-            print("current is target")
-            break
+        print("openList", openList, "at iteration", iteration)
+        print("closedList", closedList, "at iteration", iteration)
+        if len(openList) == 0:
+            print("openList is None, don't think it ever come here though, cuz while stops")
+            path = calculatePath(target)
+            for node in path:
+                print(node.id)
+            return path
 
-        for adj, weight in current.adjacent.items():
-            print("going through adjacents")
-            if adj == target:
-                print("adj is target")
-                adj.previous = current
-                adj.distance = current.distance + weight
-                break
-            else:
-                newF = current.distance + weight + calculateHeristicDistAsGrid(adj, target)
-                print("calculating newF", newF)
+        length, _,  min_node = hq.heappop(openList)
+        openListSetId.remove(min_node.id)
+        print("length: ", length, "min_node: ", min_node)
 
-            if adj not in openList and adj not in closedList:
-                print("adj not in openList or closedList, therefore adding to openList")
-                hq.heappush(openList, (newF, adj))
-                adj.previous = current
-                adj.distance = current.distance + weight
+        if min_node == target:
+            print("node is target, return path target")
+            path = calculatePath(target)
+            for node in path:
+                print(node.id)
+            return path
 
-            if adj in openList:
-                print("adj in openList")
-                # find the node in openList which has the same id as adj, and check if the f value is smaller than the new f value
-                for i in range(len(openList)):
-                    print("i:", i)
-                    if openList[i][1] == adj:
-                        print(i, "in openList is adj")
-                        if openList[i][0] > newF:
-                            print("newf is smaller than openList[i][0], therefore replacing with newF:", newF)
-                            openList[i] = (newF, adj)
-                            adj.previous = current
-                            adj.distance = current.distance + weight
-                        break
+        for adj, weight in min_node.adjacent.items():
+            print("going into for loop for adjacent nodes")
+            # Calculate heuristic distance of current vertex to destination vertex
+            heuristicDist = calculateHeristicDistAsGrid(adj, target)
+            # Calculate f value for current vertex(f = g + h)
+            f = min_node.distance + weight + heuristicDist
+            print("g is:", min_node.distance, "h is:", heuristicDist, "weight is", weight, "f is:", f, "adj is:", adj)
 
-            elif adj in closedList:
-                print("adj in closedList")
-                for i in range(len(closedList)):
-                    print("i:", i)
-                    if closedList[i][1] == adj:
-                        print(i, "in closedlist is adj")
-                        if closedList[i][0] < newF:
-                            print("newF is bigger therefore skipping, newF:", newF)
-                            break
-                        else:
-                            print("newF is smaller therefore replacing, newF:", newF)
-                            hq.heappush(openList, (newF, adj))
-                            adj.previous = current
-                            adj.distance = current.distance + weight
+            if adj.id not in closedListSetId and adj.id not in openListSetId:
+                print("adj is not in closedList or openList, push to openList")
+                adj._distance = min_node.distance + weight
+                adj._previous = min_node
+                hq.heappush(openList, (f, adj.id, adj))
+                openListSetId.add(adj.id)
 
-        hq.heappush(closedList, (smallestF, current))
+            elif adj.id in openListSetId:
+                    print("adj is in openList")
+                    #Get the node from openList's heruistic value
+                    for nodes in openList:
+                        if adj in nodes:
+                            print("adj is in nodes")
+                            if f < nodes[0]:
+                                print("f is less than nodes[0], update distance and previous and push top openList")
+                                adj._distance = min_node._distance + weight
+                                adj._previous = min_node
+                                openList.remove((nodes[0], adj.id, adj))
+                                openListSetId.remove(adj.id)
+                                hq.heappush(openList, (f, adj.id, adj))
+                                openListSetId.add(adj.id)
+                                break
 
-    path = []
-    while target is not None:
-        path.append(target)
-        target = target.previous
-    return path[::-1]
-
+        hq.heappush(closedList, (length, min_node.id, min_node))
+        closedListSetId.add(min_node.id)
+        iteration += 1
 
 def initSingleSource(graph, source):
     for node in graph:
@@ -126,3 +125,13 @@ def calcHeuristicDist(source, target):
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
     return R * c
+
+def calculatePath(target):
+    path = []
+    print("calculatePath")
+    print("target is:", target)
+    while target is not None:
+        path.append(target)
+        target = target.previous
+        print("new target is:", target)
+    return path[::-1]
