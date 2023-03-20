@@ -51,13 +51,6 @@ def aStar(graph, source, target):
         openListSetId.remove(min_node.id)
         print("length: ", length, "min_node: ", min_node)
 
-        if min_node == target:
-            print("node is target, return path target")
-            path = calculatePath(target)
-            for node in path:
-                print(node.id)
-            return path
-
         for adj, weight in min_node.adjacent.items():
             print("going into for loop for adjacent nodes")
             # Calculate heuristic distance of current vertex to destination vertex
@@ -89,6 +82,14 @@ def aStar(graph, source, target):
                                 openListSetId.add(adj.id)
                                 break
 
+            if adj.id == target.id:
+                adj._distance = min_node._distance + weight
+                adj._previous = min_node
+                path = calculatePath(target)
+                for node in path:
+                    print(node.id)
+                return path
+        print("last case heappush")
         hq.heappush(closedList, (length, min_node.id, min_node))
         closedListSetId.add(min_node.id)
         iteration += 1
