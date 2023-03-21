@@ -34,12 +34,14 @@ def initSingleSource(graph, source):
         node._previous = None
     source._distance = 0
 
+
 def relax(min_node, adj, weight, not_visited):
     new_dist = min_node.distance + weight
     if new_dist < adj.distance:
         adj.distance = new_dist
         adj.previous = min_node
         hq.heappush(not_visited, (new_dist, adj))
+
 
 def calculatePath(target):
     path = []
