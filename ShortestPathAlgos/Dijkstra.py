@@ -3,7 +3,10 @@ import sys
 import heapq as hq
 
 
-def dijkstra(graph, source, target):
+
+
+
+def dijkstra(graph, source, target, returnVisited=False):
     copyOfGraphList = list(graph.nodeList.values())
     initSingleSource(copyOfGraphList, source)
 
@@ -22,11 +25,7 @@ def dijkstra(graph, source, target):
                 continue
             relax(min_node, adj, weight, queue)
 
-    path = []
-    while target is not None:
-        path.append(target)
-        target = target.previous
-    return path[::-1]
+    return calculatePath(target) if not returnVisited else (calculatePath(target), len(visited))
 
 
 def initSingleSource(graph, source):
@@ -42,5 +41,11 @@ def relax(min_node, adj, weight, not_visited):
         adj.previous = min_node
         hq.heappush(not_visited, (new_dist, adj))
 
+def calculatePath(target):
+    path = []
+    while target is not None:
+        path.append(target)
+        target = target.previous
+    return path[::-1]
 
 

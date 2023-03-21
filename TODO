@@ -6,10 +6,5 @@ Pedestrian, Access*, Busway, (Escape mby), Bus_guideway, footway, bridleway, cor
 
 
 Backlog:
-    - Kør dijstra lidt mere for at sikre at den virker
-    - clean koden lidt op og tilføj eventuel dokumentation (spørg Gerth)
-    - implementer de næste algoritmer
-    - Skriv rapport:
-        - Pre-processing
-        - Visualization omkring folium
-        - Dijkstra teori og implementation
+    - Færdiggør det at vi kan gemme data som csv
+    - fortsæt med at arbejde på det så vi kan kalde main med argumenter

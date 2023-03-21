@@ -1,6 +1,4 @@
 import folium
-import osmnx as ox
-import Util
 
 
 def visualize_map():

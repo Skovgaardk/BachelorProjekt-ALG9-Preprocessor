@@ -1,8 +1,22 @@
 import osmium as osm
+import os.path
 
 ways = set()
 refs = set()
 nodes = set()
+
+def handleXML(mapToUse: str, newXMLPath):
+    wayHandler = StreetHandler()
+    nodeHandler = NodeHandler()
+    wayHandler.apply_file(mapToUse)
+    nodeHandler.apply_file(mapToUse)
+
+    if os.path.exists(newXMLPath):
+        os.remove(newXMLPath)
+
+    writer = wayWriter(newXMLPath)
+    writer.apply_file(mapToUse)
+    writer.close()
 
 class Handler(osm.SimpleHandler):
     def __init__(self):
@@ -42,7 +56,6 @@ class NodeHandler(osm.SimpleHandler):
 
     def node(self, n):
         if n.id in refs:
-            print("Found node in refs: " + str(n.id))
             nodes.add(n.id)
 
 class wayWriter(osm.SimpleHandler):
@@ -64,9 +77,6 @@ class wayWriter(osm.SimpleHandler):
 
     def close(self):
         self.writer.close()
-
-
-
 
 
 
