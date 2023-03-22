@@ -103,6 +103,12 @@ def calculateHeuristicDist(source, target, heuristic = "euclidean"):
         c = 2 * atan2(sqrt(a), sqrt(1 - a))
 
         return R * c
+    elif heuristic == "greedy":
+        dx = abs(source.lat - target.lat)
+        dy = abs(source.lon - target.lon)
+        return sqrt(dx * dx + dy * dy)
+
+
 
 def calculatePath(target):
     path = []

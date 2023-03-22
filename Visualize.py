@@ -17,15 +17,14 @@ def visualize_shortest_path(path):
 
     folium.PolyLine(path, color="red", weight=2.5, opacity=1).add_to(map)
 
-
-
-
     return map
 
-  #  G = ox.graph_from_xml(testPath)
-  #
-  #  gdf_nodes, gdf_edges = ox.graph_to_gdfs(G)
-  #
-  #  G = ox.graph_from_gdfs(gdf_nodes, gdf_edges, graph_attrs=G.graph)
-  # fig, ax = ox.plot_graph(G, node_size=10, node_zorder=0, edge_linewidth=0.5, edge_color='white', show=False, close=False)
-  # fig.show()
+def visualize_path(path):
+
+    pathLatLon = []
+    for node in path:
+        pathLatLon.append([node.lat, node.lon])
+
+    map = visualize_shortest_path(pathLatLon)
+    map.render()
+    map.show_in_browser()

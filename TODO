@@ -6,5 +6,8 @@ Pedestrian, Access*, Busway, (Escape mby), Bus_guideway, footway, bridleway, cor
 
 
 Backlog:
-    - Færdiggør det at vi kan gemme data som csv
-    - fortsæt med at arbejde på det så vi kan kalde main med argumenter
+    - Fikse Astar time complexity
+    - Gør det med at køre igennem terminalen lidt bedre (fiks navne bla.a)
+    - Måske kigge på en måde at fjerne nogle af de unødvendige nodes på
+    - Lave biDirectional dijkstra
+
