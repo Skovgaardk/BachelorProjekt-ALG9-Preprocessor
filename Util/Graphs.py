@@ -104,3 +104,20 @@ def printDiGraph(diGraph):
             neighborIds = [neighbor.id]
             neighborWeights = [diGraph.getNode(node).adjacent[neighbor]]
             print("Neighbor: ", neighborIds, "Weight: ", neighborWeights)
+
+
+def transposeDiGraph(diGraph):
+    # Creates a new graph
+    newGraph = DiGraph()
+    # Adds all the nodes from the original graph to the new graph
+    for node in diGraph.nodeList:
+        lat, lon = diGraph.getNode(node).lat, diGraph.getNode(node).lon
+        newGraph.addNode(node, lat, lon)
+    # Adds all the edges from the original graph to the new graph
+    for node in diGraph.nodeList:
+        neighbors = diGraph.getNode(node).getNeighbors()
+        for neighbor in neighbors:
+            neighborId = neighbor.id
+            weight = diGraph.getNode(node).adjacent[neighbor]
+            newGraph.addEdge(neighborId, neighbor.lat, neighbor.lon, node, diGraph.getNode(node).lat, diGraph.getNode(node).lon, weight)
+    return newGraph

@@ -37,6 +37,8 @@ def read_DiGrapgh_from_Parquet(filename):
 
     graph = Graphs.DiGraph()
 
+    amountOfRows = df.shape[0]
+    iterator = 0
     for i, row in df.iterrows():
         nodeId, lat, lon = row["Node"], row["lat"], row["lon"]
         graph.addNode(nodeId, lat, lon)
@@ -44,6 +46,10 @@ def read_DiGrapgh_from_Parquet(filename):
         weights = row["weights"]
         for neighbor, weight in zip(adjacent, weights):
             graph.addEdge(nodeId, lat, lon, neighbor, adjacent[neighbor][0], adjacent[neighbor][1], weight)
+        # Every 10% of the data, print the progress
+        if iterator % (amountOfRows // 10) == 0:
+            print(f"{iterator / amountOfRows * 100:.2f}%")
+        iterator += 1
 
 
     return graph

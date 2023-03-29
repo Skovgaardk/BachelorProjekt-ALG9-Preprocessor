@@ -5,17 +5,21 @@ ways = set()
 refs = set()
 nodes = set()
 
-def handleXML(mapToUse: str, newXMLPath):
+def handleXML(mapToUse: str, newXMLPath: str):
     wayHandler = StreetHandler()
     nodeHandler = NodeHandler()
     wayHandler.apply_file(mapToUse)
+    print("Wayhandler done")
     nodeHandler.apply_file(mapToUse)
+    print("Nodehandler done")
 
     if os.path.exists(newXMLPath):
         os.remove(newXMLPath)
 
     writer = wayWriter(newXMLPath)
+    print("Writer created")
     writer.apply_file(mapToUse)
+    print("Writer done")
     writer.close()
 
 class Handler(osm.SimpleHandler):

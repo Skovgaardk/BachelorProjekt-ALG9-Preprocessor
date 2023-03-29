@@ -22,6 +22,8 @@ if __name__ == '__main__':
     print("Map to use: ", mapToUse)
     print("Processing map to new XML file...")
     mapname = mapToUse[10:]
+    mapname = mapname[:-4]
+    print("Map name: ", mapname)
     XMLhandlers.handleXML(mapToUse, "ProcessedXML/" + mapname + ".xml")
 
     print("Parsing XML file to DiGraph...")
@@ -30,6 +32,8 @@ if __name__ == '__main__':
 
     print("Writing DiGraph to file...")
     DataManager.write_DiGraph_to_file_Parquet(diGraph, mapname)
+
+
 
 
 

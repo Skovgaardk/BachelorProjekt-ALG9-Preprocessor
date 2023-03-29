@@ -4,7 +4,7 @@ import timeit
 import Visualize
 from Visualize import visualize_path
 from Util import DataManager
-from ShortestPathAlgos import Dijkstra, AStar
+from ShortestPathAlgos import Dijkstra, AStar, BiDiDijstra
 
 if __name__ == '__main__':
 
@@ -23,12 +23,16 @@ if __name__ == '__main__':
     end = args.end
     visited = args.visited
 
-    startTime1 = timeit.default_timer()
 
-    if algorithm != "dijkstra" and algorithm != "astar":
+
+    algorithms = {"dijkstra", "astar", "bididijkstra"}
+
+    if algorithm not in algorithms:
         print("Invalid algorithm")
         exit()
 
+    print("Reading graph from file...")
+    startTime1 = timeit.default_timer()
     diGraph = DataManager.read_DiGrapgh_from_Parquet(graph)
     print("Time to read graph: ", timeit.default_timer()-startTime1)
 
@@ -41,6 +45,10 @@ if __name__ == '__main__':
         startTime3 = timeit.default_timer()
         result = AStar.aStar(diGraph, diGraph.nodeList[start], diGraph.nodeList[end], returnVisited=visited)
         print("Time to run A*: ", timeit.default_timer()-startTime3)
+    elif algorithm == "bididijkstra":
+        startTime4 = timeit.default_timer()
+        result = BiDiDijstra.biDiDijkstra(diGraph, diGraph.nodeList[start], diGraph.nodeList[end], returnVisited=visited)
+        print("Time to run Bidirectional Dijkstra: ", timeit.default_timer()-startTime4)
     else:
         print("Invalid algorithm")
 
