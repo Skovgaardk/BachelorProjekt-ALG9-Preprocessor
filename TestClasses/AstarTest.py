@@ -1,6 +1,7 @@
 import unittest
 from ShortestPathAlgos import AStar
 import Util.Graphs as Graphs
+import timeit
 
 
 class AstarTest(unittest.TestCase):
@@ -82,7 +83,10 @@ class AstarTest(unittest.TestCase):
         graph.nodeList[15].addNeighbor(graph.nodeList[10], 4)
         graph.nodeList[15].addNeighbor(graph.nodeList[13], 7)
 
+
+        start = timeit.default_timer()
         path = AStar.aStar(graph, graph.nodeList[0], graph.nodeList[15], "grid")
+        print("Time: ", (timeit.default_timer() - start)*1000)
 
         pathWeight = 0
         for i in range(len(path) - 1):

@@ -2,6 +2,7 @@ import unittest
 
 from ShortestPathAlgos import Dijkstra
 import Util.Graphs as Graphs
+import timeit
 
 
 
@@ -45,7 +46,10 @@ class DijkstraTest(unittest.TestCase):
         graph.nodeList[3].addNeighbor(graph.nodeList[2], 7)
 
         # test the Dijkstra algorithm
+        start = timeit.default_timer()
         path = Dijkstra.dijkstra(graph, graph.nodeList[0], graph.nodeList[4])
+        print("time: ", (timeit.default_timer() - start)*1000)
+
 
         pathWeight = 0
         for i in range(len(path) - 1):

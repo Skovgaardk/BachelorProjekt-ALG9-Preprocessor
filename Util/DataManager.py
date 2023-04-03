@@ -1,10 +1,7 @@
-import time
-
 import pandas as pd
 import os.path
-import ast
+import timeit
 
-from collections import defaultdict
 from Util import Graphs, Nodes
 
 
@@ -33,8 +30,11 @@ def write_DiGraph_to_file_Parquet(graph, filename):
 
 
 def read_DiGrapgh_from_Parquet(filename):
+    start = timeit.default_timer()
     df = pd.read_parquet(filename)
+    print("Time to read graph: ", timeit.default_timer() - start)
 
+    print("Converting to graph...")
     graph = Graphs.DiGraph()
 
     amountOfRows = df.shape[0]
@@ -50,7 +50,6 @@ def read_DiGrapgh_from_Parquet(filename):
         if iterator % (amountOfRows // 10) == 0:
             print(f"{iterator / amountOfRows * 100:.2f}%")
         iterator += 1
-
 
     return graph
 

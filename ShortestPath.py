@@ -32,9 +32,8 @@ if __name__ == '__main__':
         exit()
 
     print("Reading graph from file...")
-    startTime1 = timeit.default_timer()
     diGraph = DataManager.read_DiGrapgh_from_Parquet(graph)
-    print("Time to read graph: ", timeit.default_timer()-startTime1)
+
 
     result = None
     if algorithm == "dijkstra":

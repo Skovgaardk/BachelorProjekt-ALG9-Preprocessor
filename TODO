@@ -6,8 +6,13 @@ Pedestrian, Access*, Busway, (Escape mby), Bus_guideway, footway, bridleway, cor
 
 
 Backlog:
-    - Fikse Astar time complexity
     - Gør det med at køre igennem terminalen lidt bedre (fiks navne bla.a)
     - Måske kigge på en måde at fjerne nogle af de unødvendige nodes på
-    - Lave biDirectional dijkstra
+
+
+    - Bidirectional dijkstra virker ikke helt, vejl sker i getWeights metode.
+    - Ting som kunne ske at skabe disse problemer:
+            - vi måske kommer til at ændre på vejene i vores graph
+            - vi kommer måske til at lave en forkert path (tror jeg ikke)
+            - Det kan være et problem med at den ændre på nodeobjekterne når vi transponere grafen eller noget.
 
