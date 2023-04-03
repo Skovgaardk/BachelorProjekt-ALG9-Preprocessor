@@ -54,8 +54,13 @@ def biDiDijkstra(graph, source, target, returnVisited=False):
         # backward search
         _, _,  min_node = hq.heappop(openBackward)
         visited.add(min_node)
-        for adj, weight in min_node.adjacent.items():
-            relax(min_node, adj, weight, openBackward, backwardDist)
+        min_node_index = transposedGraphList.index(min_node)
+        for adj, weight in transposedGraphList[min_node_index].adjacent.items():
+            new_dist = backwardDist[min_node.id] + weight
+            if adj.id not in backwardDist or new_dist < backwardDist[adj.id]:
+                backwardDist[adj.id] = new_dist
+                adj.previous = min_node
+                hq.heappush(openBackward, (new_dist, adj.id, adj))
 
 
 def calculatePath(node, openList, graph, isBackward):
