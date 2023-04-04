@@ -47,13 +47,12 @@ class DijkstraTest(unittest.TestCase):
 
         # test the Dijkstra algorithm
         start = timeit.default_timer()
-        path = Dijkstra.dijkstra(graph, graph.nodeList[0], graph.nodeList[4])
+        path, weight, visited = Dijkstra.dijkstra(graph, graph.nodeList[0], graph.nodeList[4])
         print("time: ", (timeit.default_timer() - start)*1000)
 
-
-        pathWeight = 0
-        for i in range(len(path) - 1):
-            pathWeight += graph.getWeight(path[i].id, path[i + 1].id)
+        print("path: ", path)
+        print("weight: ", weight)
+        print("visited: ", visited)
 
         # check if the path is correct
         self.assertEqual(path[0].id, 0)
@@ -61,7 +60,7 @@ class DijkstraTest(unittest.TestCase):
         self.assertEqual(path[2].id, 6)
         self.assertEqual(path[3].id, 5)
         self.assertEqual(path[4].id, 4)
-        self.assertEqual(pathWeight, 21)
+        self.assertEqual(weight, 21)
 
 
 

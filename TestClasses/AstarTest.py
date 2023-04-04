@@ -85,12 +85,13 @@ class AstarTest(unittest.TestCase):
 
 
         start = timeit.default_timer()
-        path = AStar.aStar(graph, graph.nodeList[0], graph.nodeList[15], "grid")
+        path, weight, visited = AStar.aStar(graph, graph.nodeList[0], graph.nodeList[15], "grid")
         print("Time: ", (timeit.default_timer() - start)*1000)
 
-        pathWeight = 0
-        for i in range(len(path) - 1):
-            pathWeight += graph.getWeight(path[i].id, path[i + 1].id)
+
+        print("Path: ", path)
+        print("Weight: ", weight)
+        print("Visited: ", visited)
 
         #Check if the path mathces: 0, 5, 9, 12, 13, 17, 18, 19
         self.assertEqual(path[0].id, 0)
@@ -101,7 +102,7 @@ class AstarTest(unittest.TestCase):
         self.assertEqual(path[5].id, 15)
 
         #Check if the path weight is correct
-        self.assertEqual(pathWeight, 28)
+        self.assertEqual(weight, 28)
 
 
 def main():

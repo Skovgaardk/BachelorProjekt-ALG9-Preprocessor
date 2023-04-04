@@ -6,9 +6,8 @@ import heapq as hq
 
 
 
-def dijkstra(graph, source, target, returnVisited=False):
-    copyOfGraphList = list(graph.nodeList.values())
-    initSingleSource(copyOfGraphList, source)
+def dijkstra(graph, source, target):
+    initSingleSource(graph.nodeList.values(), source)
 
     visited = set()
 
@@ -25,7 +24,9 @@ def dijkstra(graph, source, target, returnVisited=False):
                 continue
             relax(min_node, adj, weight, queue)
 
-    return calculatePath(target) if not returnVisited else (calculatePath(target), len(visited))
+    weight = target.distance
+
+    return calculatePath(target), weight, len(visited)
 
 
 def initSingleSource(graph, source):

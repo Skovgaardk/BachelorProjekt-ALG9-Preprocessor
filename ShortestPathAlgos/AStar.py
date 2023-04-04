@@ -13,7 +13,7 @@ import heapq as hq
 from math import sin, cos, sqrt, atan2, radians
 
 
-def aStar(graph, source, target, heuristic = "euclidean", returnVisited = False):
+def aStar(graph, source, target, heuristic = "euclidean"):
     #Initialiserer alle noderne i grafen
     copyOfGraphList = list(graph.nodeList.values())
 
@@ -26,19 +26,20 @@ def aStar(graph, source, target, heuristic = "euclidean", returnVisited = False)
     openListSetId = {source.id}
     closedListSetId = set()
 
+    visited = set()
+
     # While current vertex is not the destination vertex
     iteration = 0
     while True:
         _, _,  min_node = hq.heappop(openList)
+        visited.add(min_node)
         openListSetId.remove(min_node.id)
 
         closedListSetId.add(min_node.id)
         iteration += 1
 
         if min_node == target:
-            if returnVisited:
-                return calculatePath(min_node), len(closedListSetId)
-            return calculatePath(min_node)
+            break
 
         for adj, weight in min_node.adjacent.items():
             if adj.id in closedListSetId:
@@ -71,6 +72,10 @@ def aStar(graph, source, target, heuristic = "euclidean", returnVisited = False)
             #     adj._previous = min_node
             #     path = calculatePath(target)
             #     return path, len(closedListSetId)
+
+    weight = target.distance
+
+    return calculatePath(target), weight, len(visited)
 
 
 def initSingleSource(graph, source, target, heuristic = "euclidean"):

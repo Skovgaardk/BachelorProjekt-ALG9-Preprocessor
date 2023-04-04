@@ -1,3 +1,5 @@
+import webbrowser
+
 import folium
 
 
@@ -27,4 +29,7 @@ def visualize_path(path):
 
     map = visualize_shortest_path(pathLatLon)
     map.render()
-    map.show_in_browser()
+    map.save("latestPath.html")
+    webbrowser.open("latestPath.html")
+
+

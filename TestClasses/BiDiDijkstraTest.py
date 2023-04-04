@@ -61,46 +61,22 @@ class DijkstraTest(unittest.TestCase):
         graph.nodeList[8].addNeighbor(graph.nodeList[6], 6)
         graph.nodeList[5].addNeighbor(graph.nodeList[4], 10)
 
-        getVisitedNodes = True
-
         # test the Dijkstra algorithm
         start = timeit.default_timer()
-        path = BiDiDijstra.biDiDijkstra(graph, graph.nodeList[0], graph.nodeList[4], getVisitedNodes)
+        path, weight, len = BiDiDijstra.biDiDijkstra(graph, graph.nodeList[0], graph.nodeList[4])
         print("Time: ", (timeit.default_timer() - start)*1000)
 
+        print("Visited nodes: ", end="")
+        for node in path:
+            print(node.id, end=" ")
 
-        if getVisitedNodes:
-            print("Visited nodes: ", end="")
-            for node in path[0]:
-                print(node.id, end=" ")
+        self.assertEqual(path[0].id, 0)
+        self.assertEqual(path[1].id, 7)
+        self.assertEqual(path[2].id, 6)
+        self.assertEqual(path[3].id, 5)
+        self.assertEqual(path[4].id, 4)
+        self.assertEqual(weight, 21)
 
-            pathWeight = 0
-            actualPath = path[0]
-            for i in range(len(actualPath) - 1):
-                pathWeight += graph.getWeight(actualPath[i].id, actualPath[i + 1].id)
-
-            self.assertEqual(actualPath[0].id, 0)
-            self.assertEqual(actualPath[1].id, 7)
-            self.assertEqual(actualPath[2].id, 6)
-            self.assertEqual(actualPath[3].id, 5)
-            self.assertEqual(actualPath[4].id, 4)
-            self.assertEqual(pathWeight, 21)
-
-        else:
-            print("Path: ", end="")
-            for node in path:
-                print(node.id, end=" ")
-
-            pathWeight = 0
-            for i in range(len(path) - 1):
-                pathWeight += graph.getWeight(path[i].id, path[i + 1].id)
-
-            self.assertEqual(path[0].id, 0)
-            self.assertEqual(path[1].id, 7)
-            self.assertEqual(path[2].id, 6)
-            self.assertEqual(path[3].id, 5)
-            self.assertEqual(path[4].id, 4)
-            self.assertEqual(pathWeight, 21)
 
 
 def main():

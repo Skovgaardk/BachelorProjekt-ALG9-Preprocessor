@@ -6,16 +6,14 @@ import time
 import Util.Graphs
 
 
-def biDiDijkstra(graph, source, target, returnVisited=False):
+def biDiDijkstra(graph, source, target):
 
     transposedGraph = Util.Graphs.transposeDiGraph(graph)
 
     targetNode = transposedGraph.nodeList[target.id]
 
-    copyOfGraphList = list(graph.nodeList.values())
-    transposedGraphList = list(transposedGraph.nodeList.values())
-
-    target = transposedGraphList[transposedGraphList.index(targetNode)]
+    initSingleSource(graph.nodeList.values(), source)
+    initSingleSource(transposedGraph.nodeList.values(), targetNode)
 
     visited = set()
 
@@ -23,28 +21,28 @@ def biDiDijkstra(graph, source, target, returnVisited=False):
         source = graph.nodeList[source]
 
     if type(target) == str:
-        target = graph.nodeList[target]
+        target = targetNode
 
     openForward = [(0, source.id, source)]
     forwardDist = {source.id: 0}
     openBackward = [(0, target.id, target)]
     backwardDist = {target.id: 0}
-    print("Source", source.id, "Target", target.id)
 
+
+    intercept = None
     while True:
         if openForward[0][1] in backwardDist:
-            return calculatePath(openForward[0][2], openBackward, graph, False) if not returnVisited else \
-                (calculatePath(openForward[0][2], openBackward, graph, False), len(visited))
+            intercept = openForward[0][2]
+            break
 
         if openBackward[0][1] in forwardDist:
-            return calculatePath(openBackward[0][2], openForward, graph, True) if not returnVisited else \
-                (calculatePath(openBackward[0][2], openForward, graph, True), len(visited))
+            intercept = openBackward[0][2]
+            break
 
         # forward search
         _, _,  min_node = hq.heappop(openForward)
         visited.add(min_node)
-        min_node_index = copyOfGraphList.index(min_node)
-        for adj, weight in copyOfGraphList[min_node_index].adjacent.items():
+        for adj, weight in graph.nodeList[min_node.id].adjacent.items():
             new_dist = forwardDist[min_node.id] + weight
             if adj.id not in forwardDist or new_dist < forwardDist[adj.id]:
                 forwardDist[adj.id] = new_dist
@@ -54,8 +52,7 @@ def biDiDijkstra(graph, source, target, returnVisited=False):
         # backward search
         _, _,  min_node = hq.heappop(openBackward)
         visited.add(min_node)
-        min_node_index = transposedGraphList.index(min_node)
-        for adj, weight in transposedGraphList[min_node_index].adjacent.items():
+        for adj, weight in transposedGraph.nodeList[min_node.id].adjacent.items():
             new_dist = backwardDist[min_node.id] + weight
             if adj.id not in backwardDist or new_dist < backwardDist[adj.id]:
                 backwardDist[adj.id] = new_dist
@@ -63,41 +60,42 @@ def biDiDijkstra(graph, source, target, returnVisited=False):
                 hq.heappush(openBackward, (new_dist, adj.id, adj))
 
 
-def calculatePath(node, openList, graph, isBackward):
+    while openForward:
+        dist, _, min_node = hq.heappop(openForward)
+        if min_node.id in backwardDist:
+            new_dist = dist + backwardDist[min_node.id]
+            if min_node.id not in forwardDist or new_dist < forwardDist[min_node.id]:
+                forwardDist[min_node.id] = new_dist
+                min_node.previous = min_node
+                intercept = min_node
+
+    weight = forwardDist[intercept.id] + backwardDist[intercept.id]
+
+    path = calculatePath(intercept, transposedGraph)
+
+    return path, weight, len(visited)
+
+def calculatePath(node, transPosedgraph):
     path = []
-    while node is not None:
-        path.append(node)
-        node = node.previous
+
+    forwardNode = node
+    while forwardNode is not None:
+        path.append(forwardNode)
+        forwardNode = forwardNode.previous
 
     backwardPath = []
-    if openList:
-        _, _, node = hq.heappop(openList)
-        while node is not None:
-            backwardPath.append(node)
-            node = node.previous
+    backwardNode = transPosedgraph.nodeList[node.id]
+    while backwardNode is not None:
+        backwardPath.append(backwardNode)
+        backwardNode = backwardNode.previous
 
-    ## if it is backwards path, translate the backward path to the original graph
-    if isBackward:
-        for i in range(len(backwardPath)):
-            backwardPath[i] = graph.nodeList[backwardPath[i].id]
-    ## If it is forward path, translate the forward path to the transposed graph
-    else:
-        for i in range(len(path)):
-            path[i] = graph.nodeList[path[i].id]
-
-    ## print node in both paths
-    # for node in path:
-    #     for node2 in backwardPath:
-    #         if node.id == node2.id:
-    #             print("Node in both paths: ", end=' ')
-    #             print(node, end=' ')
-    #     print()
-
-    print("Path: ")
-    for node in path:
-        print(node)
+    completePath = path[::-1] + backwardPath[1:]
+    return completePath
 
 
-    return path[::-1] + backwardPath[1:]
-
+def initSingleSource(graph, source):
+    for node in graph:
+        node._distance = float('inf')
+        node._previous = None
+    source._distance = 0
 
