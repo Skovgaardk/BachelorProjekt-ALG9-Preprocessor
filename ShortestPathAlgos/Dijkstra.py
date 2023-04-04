@@ -7,12 +7,19 @@ import heapq as hq
 
 
 def dijkstra(graph, source, target):
+
+
     initSingleSource(graph.nodeList.values(), source)
 
     visited = set()
 
     queue = [(0, source)]
-    while queue:
+    while True:
+
+        # the queue is empty, there is no path
+        if not queue:
+            return None, None, None
+
         min_dist, min_node = hq.heappop(queue)
         if min_node in visited:
             continue

@@ -51,6 +51,8 @@ def read_DiGrapgh_from_Parquet(filename):
             print(f"{iterator / amountOfRows * 100:.2f}%")
         iterator += 1
 
+    del df
+
     return graph
 
 

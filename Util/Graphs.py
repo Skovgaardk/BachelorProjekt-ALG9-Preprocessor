@@ -1,6 +1,7 @@
 import numpy as np
 from math import sin, cos, sqrt, atan2, radians
 import Util.Nodes as Nodes
+from collections import defaultdict
 
 class Graph:
     def __init__(self):
@@ -36,7 +37,9 @@ class Graph:
 
 
 class DiGraph:
-    def __init__(self):
+    def __init__(self, nodeList=None):
+        if nodeList is not None:
+            self.nodeList = nodeList
         self.nodeList = {}
 
     def getNodes(self):
@@ -110,14 +113,13 @@ def transposeDiGraph(diGraph):
     # Creates a new graph
     newGraph = DiGraph()
     # Adds all the nodes from the original graph to the new graph
-    for node in diGraph.nodeList:
-        lat, lon = diGraph.getNode(node).lat, diGraph.getNode(node).lon
+    for node in diGraph.nodeList.values():
+        lat, lon = node.lat, node.lon
         newGraph.addNode(node, lat, lon)
-    # Adds all the edges from the original graph to the new graph
-    for node in diGraph.nodeList:
-        neighbors = diGraph.getNode(node).getNeighbors()
+        neighbors = node.getNeighbors()
         for neighbor in neighbors:
             neighborId = neighbor.id
-            weight = diGraph.getNode(node).adjacent[neighbor]
-            newGraph.addEdge(neighborId, neighbor.lat, neighbor.lon, node, diGraph.getNode(node).lat, diGraph.getNode(node).lon, weight)
+            weight = node.adjacent[neighbor]
+            newGraph.addEdge(neighborId, neighbor.lat, neighbor.lon, node.id, node.lat, node.lon, weight)
+
     return newGraph

@@ -14,10 +14,7 @@ from math import sin, cos, sqrt, atan2, radians
 
 
 def aStar(graph, source, target, heuristic = "euclidean"):
-    #Initialiserer alle noderne i grafen
-    copyOfGraphList = list(graph.nodeList.values())
-
-    initSingleSource(copyOfGraphList, source, target, heuristic)
+    initSingleSource(graph.nodeList.values(), source)
 
     # Calculate f value for start vertex(f = g + h) hvor g = 0. f = 16
     source.heuristicDist = calculateHeuristicDist(source, target, heuristic)
@@ -31,6 +28,11 @@ def aStar(graph, source, target, heuristic = "euclidean"):
     # While current vertex is not the destination vertex
     iteration = 0
     while True:
+
+        # If openList is empty, then there is no path from source to target
+        if not openList:
+            return None, None, None
+
         _, _,  min_node = hq.heappop(openList)
         visited.add(min_node)
         openListSetId.remove(min_node.id)
@@ -78,7 +80,7 @@ def aStar(graph, source, target, heuristic = "euclidean"):
     return calculatePath(target), weight, len(visited)
 
 
-def initSingleSource(graph, source, target, heuristic = "euclidean"):
+def initSingleSource(graph, source):
     for node in graph:
         node._distance = float('inf')
         node.heuristicDist = 0

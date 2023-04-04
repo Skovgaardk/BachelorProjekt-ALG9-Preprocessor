@@ -1,67 +1,66 @@
+
 import sys
 
 import heapq as hq
 import time
+import line_profiler
 
 import Util.Graphs
 
 
-def biDiDijkstra(graph, source, target):
 
-    transposedGraph = Util.Graphs.transposeDiGraph(graph)
-
-    targetNode = transposedGraph.nodeList[target.id]
+def biDiDijkstra(graph, transPosedGraph, source, target):
+    targetNode = transPosedGraph.nodeList[target.id]
 
     initSingleSource(graph.nodeList.values(), source)
-    initSingleSource(transposedGraph.nodeList.values(), targetNode)
+    initSingleSource(transPosedGraph.nodeList.values(), targetNode)
 
     visited = set()
 
-    if type(source) == str:
-        source = graph.nodeList[source]
+    # if type(source) == str:
+    #     source = graph.nodeList[source]
+    #
+    # if type(target) == str:
+    #     target = targetNode
 
-    if type(target) == str:
-        target = targetNode
-
-    openForward = [(0, source.id, source)]
+    openForward = [(0, source)]
     forwardDist = {source.id: 0}
-    openBackward = [(0, target.id, target)]
+    openBackward = [(0, targetNode)]
     backwardDist = {target.id: 0}
-
 
     intercept = None
     while True:
-        if openForward[0][1] in backwardDist:
-            intercept = openForward[0][2]
+
+        if openForward[0][1].id in backwardDist:
+            intercept = openForward[0][1]
             break
 
-        if openBackward[0][1] in forwardDist:
-            intercept = openBackward[0][2]
+        if openBackward[0][1].id in forwardDist:
+            intercept = openBackward[0][1]
             break
 
         # forward search
-        _, _,  min_node = hq.heappop(openForward)
+        _, min_node = hq.heappop(openForward)
         visited.add(min_node)
-        for adj, weight in graph.nodeList[min_node.id].adjacent.items():
+        for adj, weight in min_node.adjacent.items():
             new_dist = forwardDist[min_node.id] + weight
             if adj.id not in forwardDist or new_dist < forwardDist[adj.id]:
                 forwardDist[adj.id] = new_dist
                 adj.previous = min_node
-                hq.heappush(openForward, (new_dist, adj.id, adj))
+                hq.heappush(openForward, (new_dist, adj))
 
         # backward search
-        _, _,  min_node = hq.heappop(openBackward)
-        visited.add(min_node)
-        for adj, weight in transposedGraph.nodeList[min_node.id].adjacent.items():
-            new_dist = backwardDist[min_node.id] + weight
+        _, min_node_back = hq.heappop(openBackward)
+        visited.add(min_node_back)
+        for adj, weight in min_node_back.adjacent.items():
+            new_dist = backwardDist[min_node_back.id] + weight
             if adj.id not in backwardDist or new_dist < backwardDist[adj.id]:
                 backwardDist[adj.id] = new_dist
-                adj.previous = min_node
-                hq.heappush(openBackward, (new_dist, adj.id, adj))
-
+                adj.previous = min_node_back
+                hq.heappush(openBackward, (new_dist, adj))
 
     while openForward:
-        dist, _, min_node = hq.heappop(openForward)
+        dist, min_node = hq.heappop(openForward)
         if min_node.id in backwardDist:
             new_dist = dist + backwardDist[min_node.id]
             if min_node.id not in forwardDist or new_dist < forwardDist[min_node.id]:
@@ -71,9 +70,10 @@ def biDiDijkstra(graph, source, target):
 
     weight = forwardDist[intercept.id] + backwardDist[intercept.id]
 
-    path = calculatePath(intercept, transposedGraph)
+    path = calculatePath(intercept, transPosedGraph)
 
     return path, weight, len(visited)
+
 
 def calculatePath(node, transPosedgraph):
     path = []
@@ -92,10 +92,8 @@ def calculatePath(node, transPosedgraph):
     completePath = path[::-1] + backwardPath[1:]
     return completePath
 
-
 def initSingleSource(graph, source):
     for node in graph:
         node._distance = float('inf')
         node._previous = None
     source._distance = 0
-

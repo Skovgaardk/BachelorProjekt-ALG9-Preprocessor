@@ -7,20 +7,33 @@ Pedestrian, Access*, Busway, (Escape mby), Bus_guideway, footway, bridleway, cor
 
 Backlog:
 VIGTIGT:
-    - Lav en ordenlig testklasse til at sammenligne og teste vores algoritmer (brug eventuelt dijstra som den vi tester op imod,
-          og kør ca. 1000 tilfældige fra/til punkter)
-    - Optimer BiDirectional Dijstra (den køre jo fucking langsomt lol)
+    - lav ændringer i testklassen så man kan køre en advanceret test hvor de alle bruger samme
+            punkter og tjek at de finder samme rute etc.
+    - Optimer BiDirectional Dijstra (den køre jo fucking langsomt lol) (brug måske line_profiler til at se
+            hvor den køre langsomt)
     - implementer en algoritme eller to mere
 
 Ikke så vigtigt:
     - Gør det med at køre igennem terminalen lidt bedre (fiks navne bla.a)
     - Måske kigge på en måde at fjerne nogle af de unødvendige nodes på
+    - kig måske på hvordan vores nodelist enlig har id som key og noden (som også har id i sig) som value
+
+
+
+Spørgsmål til Gerth:
+
+    Initsinglesource nødvendig i starten af hvert kald tild dijkstra?
+
+    Initsinglesource nødvendig i bidirectional siden vi aldrig bruger node.distance til at sammenligne med
+
+    Hvordan fanden fungere vores Astar lige nu siden jeg ikke behøver bruge selve grafen lol
 
 
 
 
+Spørgsmål til Markus i morgen:
 
-
-
-
+    InitSingleSource kaldes i starten a hvert funktion (og tager røv lang tid),
+    hvordan håndtere i det det. Kalder i den inden algoritmen. Hvornår kalder i
+    transpose Graph til bidirectional, osv.
 

@@ -1,6 +1,7 @@
 import os
 import timeit
 
+import Util.Graphs
 from ShortestPathAlgos import Dijkstra, AStar, BiDiDijstra
 from Util import DataManager
 from Visualize import visualize_path
@@ -16,10 +17,15 @@ def runAlgorithm(algorithm, diGraph, startNode, endNode):
         path, weight, visited = AStar.aStar(diGraph, diGraph.nodeList[startNode], diGraph.nodeList[endNode])
         print("Time to run A*: ", timeit.default_timer() - startTime3)
     elif algorithm == "Bidirectional Dijkstra":
+        transPosedGraph = Util.Graphs.transposeDiGraph(diGraph)
         startTime4 = timeit.default_timer()
-        path, weight, visited = BiDiDijstra.biDiDijkstra(diGraph, diGraph.nodeList[startNode],
+        path, weight, visited = BiDiDijstra.biDiDijkstra(diGraph, transPosedGraph, diGraph.nodeList[startNode],
                                                          diGraph.nodeList[endNode])
         print("Time to run Bidirectional Dijkstra: ", timeit.default_timer() - startTime4)
+
+    if path is None:
+        print("No path found between the two nodes")
+        return
 
     print("Weight of path: ", weight)
     print("Amount of visited notes:", visited)

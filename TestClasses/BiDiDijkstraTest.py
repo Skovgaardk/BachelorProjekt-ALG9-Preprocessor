@@ -1,5 +1,6 @@
 import unittest
 
+import Util.Graphs
 from ShortestPathAlgos import BiDiDijstra
 import Util.Graphs as Graphs
 import timeit
@@ -61,10 +62,14 @@ class DijkstraTest(unittest.TestCase):
         graph.nodeList[8].addNeighbor(graph.nodeList[6], 6)
         graph.nodeList[5].addNeighbor(graph.nodeList[4], 10)
 
+        transposedGraph = Util.Graphs.transposeDiGraph(graph)
+
         # test the Dijkstra algorithm
         start = timeit.default_timer()
-        path, weight, len = BiDiDijstra.biDiDijkstra(graph, graph.nodeList[0], graph.nodeList[4])
+        path, weight, len = BiDiDijstra.biDiDijkstra(graph, transposedGraph, graph.nodeList[0], graph.nodeList[4])
         print("Time: ", (timeit.default_timer() - start)*1000)
+
+        print("Path: ", path)
 
         print("Visited nodes: ", end="")
         for node in path:
