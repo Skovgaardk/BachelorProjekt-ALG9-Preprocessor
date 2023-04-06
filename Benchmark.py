@@ -68,7 +68,7 @@ def benchMarkSingleAlgorithm(diGraph, param, amount):
 
 if __name__ == '__main__':
 
-    # graph = DataManager.read_DiGrapgh_from_Parquet("ProcessedGraphs/malta-latest.parquet")
+    # graph = DataManager.read_DiGrapgh_from_Parquet("ProcessedGraphs/lta-latest.parquet")
     #
     # transPosedGraph = Util.Graphs.transposeDiGraph(graph)
     #

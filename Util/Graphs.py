@@ -114,8 +114,6 @@ def transposeDiGraph(diGraph):
     newGraph = DiGraph()
     # Adds all the nodes from the original graph to the new graph
     for node in diGraph.nodeList.values():
-        lat, lon = node.lat, node.lon
-        newGraph.addNode(node, lat, lon)
         neighbors = node.getNeighbors()
         for neighbor in neighbors:
             neighborId = neighbor.id
