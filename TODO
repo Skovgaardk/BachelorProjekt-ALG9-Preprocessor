@@ -9,8 +9,7 @@ Backlog:
 VIGTIGT:
     - lav ændringer i testklassen så man kan køre en advanceret test hvor de alle bruger samme
             punkter og tjek at de finder samme rute etc.
-    - Optimer BiDirectional Dijstra (den køre jo fucking langsomt lol) (brug måske line_profiler til at se
-            hvor den køre langsomt)
+    - Optimer BiDirectional Dijstra (den køre stadig lidt langsomt)
     - implementer en algoritme eller to mere
 
 Ikke så vigtigt:
@@ -22,18 +21,7 @@ Ikke så vigtigt:
 
 Spørgsmål til Gerth:
 
-    Initsinglesource nødvendig i starten af hvert kald tild dijkstra?
+    Hvordan fanden fungere vores Astar lige nu siden jeg ikke behøver bruge selve grafen lol? (er det pointers lol)
 
-    Initsinglesource nødvendig i bidirectional siden vi aldrig bruger node.distance til at sammenligne med
-
-    Hvordan fanden fungere vores Astar lige nu siden jeg ikke behøver bruge selve grafen lol
-
-
-
-
-Spørgsmål til Markus i morgen:
-
-    InitSingleSource kaldes i starten a hvert funktion (og tager røv lang tid),
-    hvordan håndtere i det det. Kalder i den inden algoritmen. Hvornår kalder i
-    transpose Graph til bidirectional, osv.
+    Hvorfor køre vore bidirectional dijkstra så langsomt? (ca. 50% langsommere end dijkstra)
 

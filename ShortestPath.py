@@ -2,8 +2,9 @@ import argparse
 import timeit
 
 import Visualize
+
 from Visualize import visualize_path
-from Util import DataManager
+from Util import DataManager, Graphs
 from ShortestPathAlgos import Dijkstra, AStar, BiDiDijstra
 
 if __name__ == '__main__':
@@ -42,14 +43,15 @@ if __name__ == '__main__':
         path, weight, visited = AStar.aStar(diGraph, diGraph.nodeList[start], diGraph.nodeList[end])
         print("Time to run A*: ", timeit.default_timer()-startTime3)
     elif algorithm == "bididijkstra":
+        transPosedGraph = Graphs.transposeDiGraph(diGraph)
         startTime4 = timeit.default_timer()
-        path, weight, visited = BiDiDijstra.biDiDijkstra(diGraph, diGraph.nodeList[start], diGraph.nodeList[end])
+        path, weight, visited = BiDiDijstra.biDiDijkstra(diGraph, transPosedGraph, diGraph.nodeList[start], diGraph.nodeList[end])
         print("Time to run Bidirectional Dijkstra: ", timeit.default_timer()-startTime4)
     else:
         print("Invalid algorithm")
 
     print("Weight of path: ", weight)
-    print("Amount of visited notes:", f"{visited:, d}")
+    print("Amount of visited notes:", visited)
     print("Visualizing path in browser...")
     visualize_path(path)
 

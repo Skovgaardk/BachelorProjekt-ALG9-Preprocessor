@@ -9,19 +9,16 @@ import Util.Graphs
 
 
 
+
+
 def biDiDijkstra(graph, transPosedGraph, source, target):
+    sourceNode = graph.nodeList[source.id]
     targetNode = transPosedGraph.nodeList[target.id]
 
     initSingleSource(graph.nodeList.values(), source)
     initSingleSource(transPosedGraph.nodeList.values(), targetNode)
 
     visited = set()
-
-    # if type(source) == str:
-    #     source = graph.nodeList[source]
-    #
-    # if type(target) == str:
-    #     target = targetNode
 
     openForward = [(0, source)]
     forwardDist = {source.id: 0}
@@ -30,6 +27,10 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
 
     intercept = None
     while True:
+
+        # the queue is empty, there is no path
+        if not openForward or not openBackward:
+            return None, None, None
 
         if openForward[0][1].id in backwardDist:
             intercept = openForward[0][1]
@@ -41,29 +42,35 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
 
         # forward search
         _, min_node = hq.heappop(openForward)
-        visited.add(min_node)
+        min_node_id = min_node.id
+        if min_node_id in visited:
+            continue
+        visited.add(min_node_id)
         for adj, weight in min_node.adjacent.items():
-            new_dist = forwardDist[min_node.id] + weight
+            new_dist = forwardDist[min_node_id] + weight
             if adj.id not in forwardDist or new_dist < forwardDist[adj.id]:
                 forwardDist[adj.id] = new_dist
                 adj.previous = min_node
                 hq.heappush(openForward, (new_dist, adj))
 
         # backward search
-        _, min_node_back = hq.heappop(openBackward)
-        visited.add(min_node_back)
-        for adj, weight in min_node_back.adjacent.items():
-            new_dist = backwardDist[min_node_back.id] + weight
+        _, min_node = hq.heappop(openBackward)
+        min_node_id = min_node.id
+        if min_node_id in visited:
+            continue
+        visited.add(min_node_id)
+        for adj, weight in min_node.adjacent.items():
+            new_dist = backwardDist[min_node_id] + weight
             if adj.id not in backwardDist or new_dist < backwardDist[adj.id]:
                 backwardDist[adj.id] = new_dist
-                adj.previous = min_node_back
+                adj.previous = min_node
                 hq.heappush(openBackward, (new_dist, adj))
 
     while openForward:
         dist, min_node = hq.heappop(openForward)
         if min_node.id in backwardDist:
             new_dist = dist + backwardDist[min_node.id]
-            if min_node.id not in forwardDist or new_dist < forwardDist[min_node.id]:
+            if min_node.id not in forwardDist or new_dist < forwardDist[min_node.id] + backwardDist[min_node.id]:
                 forwardDist[min_node.id] = new_dist
                 min_node.previous = min_node
                 intercept = min_node

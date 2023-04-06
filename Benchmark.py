@@ -22,42 +22,47 @@ def benchMarkSingleAlgorithm(diGraph, param, amount):
     :return:
     '''
 
-    times = set()
-    i = 0
+    times = list()
+    invalidTimes = 0
 
     transPosedGraph = Util.Graphs.transposeDiGraph(diGraph)
 
+    i = 0
     while i < amount:
 
         start = random.choice(list(diGraph.nodeList.values()))
         end = random.choice(list(diGraph.nodeList.values()))
+
+        # print every 10% progress
+        if i % (amount // 10) == 0:
+            print(f"{i / amount * 100:.2f}%", "of", param, "done")
 
         if param == "dijkstra":
             startTime2 = timeit.default_timer()
             path, weight, visited = Dijkstra.dijkstra(diGraph, start, end)
             # if the path is none, there exists no path between the two nodes, and we should not add the time to the set
             if path is None:
-                continue
-            times.add(timeit.default_timer()-startTime2)
+                invalidTimes += 1
+            times.append(timeit.default_timer()-startTime2)
             i += 1
         elif param == "astar":
             startTime3 = timeit.default_timer()
             path, weight, visited = AStar.aStar(diGraph, start, end)
             if path is None:
-                continue
-            times.add(timeit.default_timer()-startTime3)
+                invalidTimes += 1
+            times.append(timeit.default_timer()-startTime3)
             i += 1
         elif param == "bididijkstra":
             startTime4 = timeit.default_timer()
             path, weight, visited = BiDiDijstra.biDiDijkstra(diGraph, transPosedGraph, start, end)
             if path is None:
-                continue
-            times.add(timeit.default_timer()-startTime4)
+                invalidTimes += 1
+            times.append(timeit.default_timer()-startTime4)
             i += 1
         else:
             print("How did you even get here?!")
 
-        return times
+    return times, invalidTimes
 
 
 
@@ -94,8 +99,11 @@ if __name__ == '__main__':
 
     if args.algorithm == "all":
         for algorithm in algorithms:
-            times = benchMarkSingleAlgorithm(diGraph, algorithm, args.amount)
+            times, invalidTimes = benchMarkSingleAlgorithm(diGraph, algorithm, args.amount)
             print(f"Average time for {algorithm}: {sum(times)/len(times)}")
+            print(f"Total amount of times recorded: {len(times)}")
+            print(f"Total amount of invalid times: {invalidTimes}")
+            print("--------------------------------------------------")
 
     else:
         times = benchMarkSingleAlgorithm(diGraph, args.algorithm, args.amount)
