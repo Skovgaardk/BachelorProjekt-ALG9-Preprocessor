@@ -63,7 +63,6 @@ def RunAfterGraphLoaded():
 
 
 if __name__ == '__main__':
-    print("Hello World")
 
     # Get the list of all files in the ProcessedGraphs folder
     listOfProcessedGraphs = os.listdir("ProcessedGraphs")
