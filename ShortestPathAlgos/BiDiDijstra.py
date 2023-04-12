@@ -15,15 +15,15 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
     sourceNode = graph.nodeList[source.id]
     targetNode = transPosedGraph.nodeList[target.id]
 
-    initSingleSource(graph.nodeList.values(), source)
-    initSingleSource(transPosedGraph.nodeList.values(), targetNode)
-
     visited = set()
 
     openForward = [(0, source)]
     forwardDist = {source.id: 0}
     openBackward = [(0, targetNode)]
     backwardDist = {target.id: 0}
+
+    prevDictForward = dict()
+    prevDictBackward = dict()
 
     intercept = None
     while True:
@@ -50,7 +50,7 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
             new_dist = forwardDist[min_node_id] + weight
             if adj.id not in forwardDist or new_dist < forwardDist[adj.id]:
                 forwardDist[adj.id] = new_dist
-                adj.previous = min_node
+                prevDictForward[adj.id] = min_node
                 hq.heappush(openForward, (new_dist, adj))
 
         # backward search
@@ -63,7 +63,7 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
             new_dist = backwardDist[min_node_id] + weight
             if adj.id not in backwardDist or new_dist < backwardDist[adj.id]:
                 backwardDist[adj.id] = new_dist
-                adj.previous = min_node
+                prevDictBackward[adj.id] = min_node
                 hq.heappush(openBackward, (new_dist, adj))
 
     while openForward:
@@ -77,24 +77,24 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
 
     weight = forwardDist[intercept.id] + backwardDist[intercept.id]
 
-    path = calculatePath(intercept, transPosedGraph)
+    path = calculatePath(intercept, transPosedGraph, prevDictForward, prevDictBackward)
 
     return path, weight, len(visited)
 
 
-def calculatePath(node, transPosedgraph):
+def calculatePath(node, transPosedgraph, prevDictForward, prevDictBackward):
     path = []
 
     forwardNode = node
     while forwardNode is not None:
         path.append(forwardNode)
-        forwardNode = forwardNode.previous
+        forwardNode = prevDictForward.get(forwardNode.id, None)
 
     backwardPath = []
     backwardNode = transPosedgraph.nodeList[node.id]
     while backwardNode is not None:
         backwardPath.append(backwardNode)
-        backwardNode = backwardNode.previous
+        backwardNode = prevDictBackward.get(backwardNode.id, None)
 
     completePath = path[::-1] + backwardPath[1:]
     return completePath

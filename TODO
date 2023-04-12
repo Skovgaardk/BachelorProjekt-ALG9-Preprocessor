@@ -21,7 +21,17 @@ Ikke så vigtigt:
 
 Spørgsmål til Gerth:
 
-    Hvordan fanden fungere vores Astar lige nu siden jeg ikke behøver bruge selve grafen lol? (er det pointers lol)
+    Hvorfor køre vore bidirectional dijkstra så langsomt? (Fjern init single soure og lav lige nogle tests)
 
-    Hvorfor køre vore bidirectional dijkstra så langsomt? (ca. 50% langsommere end dijkstra)
+
+Noter fra møde 11/04.
+
+fjern Initsingle source i bididijkstra, find bedre løsning måske. (lav et dict med previous)
+
+Prøv eventuelt at lava datastrukturen om så vi bare har en liste med ID'er, en liste med latitude, en liste med long. osv osv.
+
+landmarks er den næste algoritme.
+
+Argumentation for korrekt rute: Man argumentere for at den algoritme/kode man har skrevet er korrekt. eventuelt igennem induktion eller andet.
+
 
