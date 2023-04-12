@@ -15,10 +15,11 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
     sourceNode = graph.nodeList[source.id]
     targetNode = transPosedGraph.nodeList[target.id]
 
-    visited = set()
+    visitedForward = set()
+    visitedBackward = set()
 
-    openForward = [(0, source)]
-    forwardDist = {source.id: 0}
+    openForward = [(0, sourceNode)]
+    forwardDist = {sourceNode.id: 0}
     openBackward = [(0, targetNode)]
     backwardDist = {target.id: 0}
 
@@ -43,9 +44,9 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
         # forward search
         _, min_node = hq.heappop(openForward)
         min_node_id = min_node.id
-        if min_node_id in visited:
+        if min_node_id in visitedForward:
             continue
-        visited.add(min_node_id)
+        visitedForward.add(min_node_id)
         for adj, weight in min_node.adjacent.items():
             new_dist = forwardDist[min_node_id] + weight
             if adj.id not in forwardDist or new_dist < forwardDist[adj.id]:
@@ -56,9 +57,9 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
         # backward search
         _, min_node = hq.heappop(openBackward)
         min_node_id = min_node.id
-        if min_node_id in visited:
+        if min_node_id in visitedBackward:
             continue
-        visited.add(min_node_id)
+        visitedBackward.add(min_node_id)
         for adj, weight in min_node.adjacent.items():
             new_dist = backwardDist[min_node_id] + weight
             if adj.id not in backwardDist or new_dist < backwardDist[adj.id]:
@@ -66,20 +67,23 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
                 prevDictBackward[adj.id] = min_node
                 hq.heappush(openBackward, (new_dist, adj))
 
+    best_dist = forwardDist[intercept.id] + backwardDist[intercept.id]
+
     while openForward:
+        if openForward == []:
+            break
         dist, min_node = hq.heappop(openForward)
         if min_node.id in backwardDist:
             new_dist = dist + backwardDist[min_node.id]
-            if min_node.id not in forwardDist or new_dist < forwardDist[min_node.id] + backwardDist[min_node.id]:
-                forwardDist[min_node.id] = new_dist
-                min_node.previous = min_node
+            if new_dist < best_dist:
                 intercept = min_node
+                best_dist = new_dist
 
     weight = forwardDist[intercept.id] + backwardDist[intercept.id]
 
     path = calculatePath(intercept, transPosedGraph, prevDictForward, prevDictBackward)
 
-    return path, weight, len(visited)
+    return path, weight, len(visitedForward) + len(visitedBackward)
 
 
 def calculatePath(node, transPosedgraph, prevDictForward, prevDictBackward):
@@ -98,9 +102,3 @@ def calculatePath(node, transPosedgraph, prevDictForward, prevDictBackward):
 
     completePath = path[::-1] + backwardPath[1:]
     return completePath
-
-def initSingleSource(graph, source):
-    for node in graph:
-        node._distance = float('inf')
-        node._previous = None
-    source._distance = 0

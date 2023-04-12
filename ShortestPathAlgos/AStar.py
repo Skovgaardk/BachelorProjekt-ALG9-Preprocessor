@@ -87,7 +87,7 @@ def initSingleSource(graph, source):
         node._previous = None
     source._distance = 0
 
-def calculateHeuristicDist(source, target, heuristic = "euclidean"):
+def calculateHeuristicDist(source, target, heuristic):
     # Calculate heuristic distance of vertex to destination vertex as grid
     if heuristic == "grid":
         HeuristicDist = abs(source.lat - target.lat) + abs(source.lon - target.lon)
