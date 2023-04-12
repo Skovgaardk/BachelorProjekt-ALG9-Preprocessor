@@ -23,6 +23,8 @@ Spørgsmål til Gerth:
 
     Hvorfor køre vore bidirectional dijkstra så langsomt? (Fjern init single soure og lav lige nogle tests)
 
+    Hvordan vælger man hvor mange landmarks man skal have?
+
 
 Noter fra møde 11/04.
 
