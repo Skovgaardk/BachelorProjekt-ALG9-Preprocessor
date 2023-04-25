@@ -7,7 +7,7 @@ import line_profiler
 
 import Util.Graphs
 
-
+from collections import defaultdict
 
 
 
@@ -21,27 +21,14 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
     openForward = [(0, sourceNode)]
     forwardDist = {sourceNode.id: 0}
     openBackward = [(0, targetNode)]
-    backwardDist = {target.id: 0}
+    backwardDist = {targetNode.id: 0}
 
     prevDictForward = dict()
     prevDictBackward = dict()
 
     intercept = None
-    while True:
-
-        # the queue is empty, there is no path
-        if not openForward or not openBackward:
-            return None, None, None
-
-        if openForward[0][1].id in backwardDist:
-            intercept = openForward[0][1]
-            break
-
-        if openBackward[0][1].id in forwardDist:
-            intercept = openBackward[0][1]
-            break
-
-        # forward search
+    while openForward and openBackward:
+    ## forward search
         _, min_node = hq.heappop(openForward)
         min_node_id = min_node.id
         if min_node_id in visitedForward:
@@ -67,23 +54,37 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
                 prevDictBackward[adj.id] = min_node
                 hq.heappush(openBackward, (new_dist, adj))
 
+        # the queue is empty, there is no path
+        if not openForward or not openBackward:
+            return None, None, None
+
+        if openForward[0][1].id in backwardDist:
+            intercept = openForward[0][1]
+            break
+
+        if openBackward[0][1].id in forwardDist:
+            intercept = openBackward[0][1]
+            break
+
     best_dist = forwardDist[intercept.id] + backwardDist[intercept.id]
 
     while openForward:
-        if openForward == []:
-            break
         dist, min_node = hq.heappop(openForward)
         if min_node.id in backwardDist:
             new_dist = dist + backwardDist[min_node.id]
             if new_dist < best_dist:
                 intercept = min_node
                 best_dist = new_dist
+                forwardDist[intercept.id] = dist
+                print("found better intercept")
+
 
     weight = forwardDist[intercept.id] + backwardDist[intercept.id]
 
     path = calculatePath(intercept, transPosedGraph, prevDictForward, prevDictBackward)
 
     return path, weight, len(visitedForward) + len(visitedBackward)
+
 
 
 def calculatePath(node, transPosedgraph, prevDictForward, prevDictBackward):

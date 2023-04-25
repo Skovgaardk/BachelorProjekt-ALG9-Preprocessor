@@ -124,6 +124,8 @@ def benchMarkAllAlgos(diGraph, amount):
             print(f"Dijkstra: {dijkstraWeight}")
             print(f"A*: {aStarWeight}")
             print(f"BiDiDijkstra: {biDiDijkstraWeight}")
+            print(f"Start: {start}")
+            print(f"End: {end}")
             print("--------------------------------------------------")
             i += 1
         else:

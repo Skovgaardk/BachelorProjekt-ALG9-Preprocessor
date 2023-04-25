@@ -3,9 +3,6 @@ import sys
 import heapq as hq
 
 
-
-
-
 def dijkstra(graph, source, target):
 
 
@@ -15,7 +12,6 @@ def dijkstra(graph, source, target):
 
     queue = [(0, source)]
     while True:
-
         # the queue is empty, there is no path
         if not queue:
             return None, None, None
