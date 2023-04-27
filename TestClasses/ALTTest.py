@@ -98,16 +98,36 @@ class ALTTest(unittest.TestCase):
         graph.nodeList[0].addNeighbor(graph.nodeList[1], 4)
         graph.nodeList[0].addNeighbor(graph.nodeList[2], 5)
         graph.nodeList[0].addNeighbor(graph.nodeList[3], 7)
+
         graph.nodeList[1].addNeighbor(graph.nodeList[4], 9)
+        graph.nodeList[1].addNeighbor(graph.nodeList[0], 4)
+
         graph.nodeList[2].addNeighbor(graph.nodeList[5], 3)
+
         graph.nodeList[3].addNeighbor(graph.nodeList[5], 4)
         graph.nodeList[3].addNeighbor(graph.nodeList[6], 6)
+        graph.nodeList[3].addNeighbor(graph.nodeList[0], 7)
+
+        graph.nodeList[4].addNeighbor(graph.nodeList[8], 13)
+        graph.nodeList[4].addNeighbor(graph.nodeList[1], 9)
+        graph.nodeList[4].addNeighbor(graph.nodeList[5], 12)
+
         graph.nodeList[5].addNeighbor(graph.nodeList[4], 12)
+        graph.nodeList[5].addNeighbor(graph.nodeList[2], 3)
+        graph.nodeList[5].addNeighbor(graph.nodeList[3], 4)
         graph.nodeList[5].addNeighbor(graph.nodeList[6], 2)
         graph.nodeList[5].addNeighbor(graph.nodeList[7], 5)
-        graph.nodeList[4].addNeighbor(graph.nodeList[8], 13)
+
         graph.nodeList[6].addNeighbor(graph.nodeList[8], 9)
+        graph.nodeList[6].addNeighbor(graph.nodeList[5], 2)
+        graph.nodeList[6].addNeighbor(graph.nodeList[3], 6)
+
         graph.nodeList[7].addNeighbor(graph.nodeList[8], 3)
+        graph.nodeList[7].addNeighbor(graph.nodeList[5], 5)
+
+        graph.nodeList[8].addNeighbor(graph.nodeList[7], 3)
+        graph.nodeList[8].addNeighbor(graph.nodeList[6], 9)
+        graph.nodeList[8].addNeighbor(graph.nodeList[4], 13)
 
         landmarks = [graph.nodeList[5]]
 

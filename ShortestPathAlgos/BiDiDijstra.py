@@ -41,8 +41,7 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
                 hq.heappush(openForward, (new_dist, adj.id, adj))
 
         # backward search
-        _, min_node = hq.heappop(openBackward)
-        min_node_id = min_node.id
+        _, min_node_id, min_node = hq.heappop(openBackward)
         if min_node_id in visitedBackward:
             continue
         visitedBackward.add(min_node_id)

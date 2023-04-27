@@ -7,8 +7,6 @@ import heapq as hq
 from ShortestPathAlgos import Dijkstra
 
 
-
-
 def findLandmarks(graph, quadrantSize=16):
     latitudes = []
     longitudes = []
@@ -22,9 +20,6 @@ def findLandmarks(graph, quadrantSize=16):
 
     meanLatitude = sumOfLatitudes / len(latitudes)
     meanLongitude = sumOfLongitudes / len(longitudes)
-
-    print("meanLatitude: ", meanLatitude)
-    print("meanLongitude: ", meanLongitude)
 
     #Create 16 quardrants
     quadrants = [[] for _ in range(quadrantSize)]
