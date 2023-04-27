@@ -7,34 +7,12 @@ Pedestrian, Access*, Busway, (Escape mby), Bus_guideway, footway, bridleway, cor
 
 Backlog:
 VIGTIGT:
-    - lav ændringer i testklassen så man kan køre en advanceret test hvor de alle bruger samme
-            punkter og tjek at de finder samme rute etc.
-    - Optimer BiDirectional Dijstra (den køre stadig lidt langsomt)
-    - implementer en algoritme eller to mere
+    - Find ud af hvorfor vores lower bound / måde at udregne Fscore ikke er korrekt-
+    - Find ud af hvorfor den kører så langsomt (brug evt. det library som sidst)
 
 Ikke så vigtigt:
-    - Gør det med at køre igennem terminalen lidt bedre (fiks navne bla.a)
     - Måske kigge på en måde at fjerne nogle af de unødvendige nodes på
-    - kig måske på hvordan vores nodelist enlig har id som key og noden (som også har id i sig) som value
 
-
-
-Spørgsmål til Gerth:
-
-    Hvorfor køre vore bidirectional dijkstra så langsomt? (Fjern init single soure og lav lige nogle tests)
-
-    Hvordan vælger man hvor mange landmarks man skal have?
-
-
-Noter fra møde 11/04.
-
-fjern Initsingle source i bididijkstra, find bedre løsning måske. (lav et dict med previous)
-
-Prøv eventuelt at lava datastrukturen om så vi bare har en liste med ID'er, en liste med latitude, en liste med long. osv osv.
-
-landmarks er den næste algoritme.
-
-Argumentation for korrekt rute: Man argumenterer for at den algoritme/kode man har skrevet er korrekt. eventuelt igennem induktion eller andet.
 
 
 

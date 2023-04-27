@@ -2,12 +2,13 @@ import os
 import timeit
 
 import Util.Graphs
-from ShortestPathAlgos import Dijkstra, AStar, BiDiDijstra
+from ShortestPathAlgos import Dijkstra, AStar, BiDiDijstra, ALT
 from Util import DataManager
 from Visualize import visualize_path
 
 
 def runAlgorithm(algorithm, diGraph, startNode, endNode):
+    path, weight, visited = None, None, None
     if algorithm == "Dijkstra":
         startTime2 = timeit.default_timer()
         path, weight, visited = Dijkstra.dijkstra(diGraph, diGraph.nodeList[startNode], diGraph.nodeList[endNode])
@@ -22,6 +23,15 @@ def runAlgorithm(algorithm, diGraph, startNode, endNode):
         path, weight, visited = BiDiDijstra.biDiDijkstra(diGraph, transPosedGraph, diGraph.nodeList[startNode],
                                                          diGraph.nodeList[endNode])
         print("Time to run Bidirectional Dijkstra: ", timeit.default_timer() - startTime4)
+    elif algorithm == "ALT":
+
+        landmarks = ALT.findLandmarks(diGraph, 16)
+
+        landmarkList = ALT.calculateLandmarkDistances(diGraph, landmarks)
+
+        startTime5 = timeit.default_timer()
+        path, weight, visited = ALT.ALT(diGraph, diGraph.nodeList[startNode], diGraph.nodeList[endNode], landmarkList)
+        print("Time to run ALT: ", timeit.default_timer() - startTime5)
 
     if path is None:
         print("No path found between the two nodes")
@@ -36,7 +46,7 @@ def runAlgorithm(algorithm, diGraph, startNode, endNode):
 def RunAfterGraphLoaded():
     print("Please select a algorithm to use from the list below:")
 
-    ListOfAlgorithms = ["Dijkstra", "A*", "Bidirectional Dijkstra"]
+    ListOfAlgorithms = ["Dijkstra", "A*", "Bidirectional Dijkstra", "ALT"]
 
     lenOfAlgorithms = len(ListOfAlgorithms)
     for i in range(len(ListOfAlgorithms)):

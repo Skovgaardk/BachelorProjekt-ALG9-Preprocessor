@@ -45,21 +45,11 @@ def findLandmarks(graph, quadrantSize=16):
             angle += 360
 
         index = int(angle / angles)
-        print("index: ", index)
         quadrants[index].append(node)
 
 
     landmarks = []
     #Iterate through the quardrants and find the node with the largest distance from the center node
-
-    print("quadrants: ")
-    i = 0
-    for quadrant in quadrants:
-        print("Quadrant: ", i)
-        for node in quadrant:
-            print(node.id)
-        i += 1  # for quardrant in [quadrants]:
-
 
     maxNode = None
     for quadrant in quadrants:
@@ -85,52 +75,59 @@ def calculateLandmarkDistances(graph, landmarks):
     '''
 
     listOfLandmarkDistances = {landmark.id: {} for landmark in landmarks}
-    for landmark in landmarks:
-        landmarkDistance = {}
-        for node in graph.nodeList.values():
-            distance = Dijkstra.dijkstra(graph, graph.nodeList[landmark.id], graph.nodeList[node.id])[1]
-            if distance is None:
-                distance = float('inf')
-            landmarkDistance[node.id] = distance
 
-        listOfLandmarkDistances[landmark.id] = landmarkDistance
+    transPosedGraph = Graph.transposeDiGraph(graph)
+
+    for landmark in landmarks:
+        distancesTo = DijkstraNoTarget(graph, landmark)
+        distancesFrom = DijkstraNoTarget(transPosedGraph, landmark)
+
+        landmarkDistances = (distancesTo, distancesFrom)
+
+        listOfLandmarkDistances[landmark.id] = landmarkDistances
 
     return listOfLandmarkDistances
 
-def greedyHeuristic(node1, node2):
-    '''
-    Heuristic function for the A* algorithm
-    :param node1:
-    :param node2:
-    :return:
-    '''
-    return math.sqrt((node1.lat - node2.lat)**2 + (node1.lon - node2.lon)**2)
+def findBestLowerBound(neighbor, landmarks, node):
+    #max(d(l,u) - d(l,v), d(v,l) - d(u,l) for all l in landmarks
 
+    bestLowerbound = -1000000
+    bestLandmark = None
+    for landmark in landmarks.values():
+        lowerBound = max(abs(landmark[0][node.id] - landmark[0][neighbor.id]), abs(landmark[1][neighbor.id] - landmark[1][node.id]))
+        if lowerBound > bestLowerbound:
+            bestLowerbound = lowerBound
+            bestLandmark = landmark
+
+    return bestLandmark
 
 
 def ALT(graph, start, end, landmarks):
 
-
     startNode = graph.nodeList[start.id]
     endNode = graph.nodeList[end.id]
 
+    startNode.distance = 0
+
     closedSet = set()
 
-    openSet = [(0, startNode)]
+    openSet = [(0, startNode.id, startNode)]
 
     fromSet = {}
+    fromSet[startNode.id] = None
 
-    gScore = {}
+    gScore = {node.id: float('inf') for node in graph.nodeList.values()}
     gScore[startNode.id] = 0
 
     #Map every node to infinite distance
-    fScore = {node.id: float('inf') for node in graph.nodeList.values()}
-    fScore[startNode.id] = greedyHeuristic(startNode, endNode)
+    fScoreList = {node.id: float('inf') for node in graph.nodeList.values()}
+    fScoreList[startNode.id] = 0
 
 
+    iteration = 0
     while openSet:
 
-        current = hq.heappop(openSet)[1]
+        current = hq.heappop(openSet)[2]
 
         if current == endNode:
             break
@@ -142,50 +139,70 @@ def ALT(graph, start, end, landmarks):
             if neighbor in closedSet:
                 continue
 
-            tentativeGScore = gScore[current.id] + weight + getLandMarkDist(current, neighbor, landmarks, weight)
+            landmark = findBestLowerBound(neighbor, landmarks, current)
 
-            if neighbor not in openSet:
-                openSet.append((tentativeGScore + greedyHeuristic(neighbor, endNode), neighbor))
-            elif tentativeGScore >= gScore[neighbor.id]:
+            tentativeGScore = gScore[current.id] + weight
+
+            ## wægt + abs(d(l,u) - d(t, l))
+
+            fscore = tentativeGScore + abs(landmark[0][neighbor.id] - landmark[1][endNode.id])
+
+            if not openSet or neighbor not in [node[2] for node in openSet]:
+                hq.heappush(openSet, (fscore, neighbor.id, neighbor))
+            elif tentativeGScore > gScore[neighbor.id]:
                 continue
 
             fromSet[neighbor.id] = current
             gScore[neighbor.id] = tentativeGScore
-            fScore[neighbor.id] = gScore[neighbor.id] + greedyHeuristic(neighbor, endNode)
-
-
+            fScoreList[neighbor.id] = fscore
 
     return calculatePath(fromSet, endNode), gScore[endNode.id], len(closedSet)
+def calculatePath(fromSet, endNode):
+    path = []
+    node = endNode
+    while node is not None:
+        path.append(node)
+        node = fromSet[node.id]
+    return path[::-1]
 
-
-
-def getLandMarkDist(node1, node2, landmarks, weight):
+def DijkstraNoTarget(graph, startNode):
     '''
-    Calculate the distance between two nodes using the landmarks and triangle inequality
-    :param node1:
-    :param node2:
-    :param landmarks:
+    Dijkstra without a target node, instead just calculates the distance to all nodes
+    :param node:
     :return:
     '''
 
-    bestFscore = float('inf')
-    for landmark in landmarks.values():
-        print("landmark: ", landmark)
-        fScore = landmark[node1.id] + landmark[node2.id] - weight
-        if fScore < bestFscore:
-            bestFscore = fScore
+    startNode = graph.nodeList[startNode.id]
 
-    return bestFscore
+    queue = [(0, startNode.id, startNode)]
+    visited = set()
 
-def calculatePath(fromSet, current):
-    totalPath = [current]
-    while fromSet[current.id] is not None:
-        current = fromSet[current.id]
-        totalPath.append(current)
+    distanceDist = {node.id: float('inf') for node in graph.nodeList.values()}
+    distanceDist[startNode.id] = 0
 
-    return totalPath[::-1]
+    while queue:
+        if not queue:
+            break
 
+        min_dist, id, min_node = hq.heappop(queue)
+        if min_node in visited:
+            continue
+        visited.add(min_node)
 
+        for neighbor, weight in min_node.adjacent.items():
+            if neighbor in visited:
+                continue
+            new_dist = min_dist + weight
+            if new_dist < distanceDist[neighbor.id]:
+                distanceDist[neighbor.id] = new_dist
+                hq.heappush(queue, (new_dist, neighbor.id, neighbor))
+
+    ## In the case where a distance is still infinity, set it to 0
+    for node in graph.nodeList.values():
+        if distanceDist[node.id] == float('inf'):
+            distanceDist[node.id] = 0
+
+    return distanceDist
 
 
 

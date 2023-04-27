@@ -115,6 +115,9 @@ def transposeDiGraph(diGraph):
     # Adds all the nodes from the original graph to the new graph
     for node in diGraph.nodeList.values():
         neighbors = node.getNeighbors()
+        if len(neighbors) == 0:
+            newGraph.addNode(node.id, node.lat, node.lon)
+            continue
         for neighbor in neighbors:
             neighborId = neighbor.id
             weight = node.adjacent[neighbor]

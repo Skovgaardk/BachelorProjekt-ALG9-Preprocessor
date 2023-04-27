@@ -8,7 +8,7 @@ import random
 import timeit
 
 import Util.Graphs
-from ShortestPathAlgos import Dijkstra, AStar, BiDiDijstra
+from ShortestPathAlgos import Dijkstra, AStar, BiDiDijstra, ALT
 from Util import DataManager
 
 from line_profiler import LineProfiler
@@ -88,10 +88,20 @@ def benchMarkAllAlgos(diGraph, amount):
     dijkstraTimes = list()
     aStarTimes = list()
     biDiDijkstraTimes = list()
+    ALTTimes = list()
+
+    dijkstraVisitedList = list()
+    aStarVisitedList = list()
+    biDiDijkstraVisitedList = list()
+    ALTVistedList = list()
 
     invalidTimes = 0
 
     transPosedGraph = Util.Graphs.transposeDiGraph(diGraph)
+
+    landmarks = ALT.findLandmarks(diGraph, 16)
+
+    landmarkDistances = ALT.calculateLandmarkDistances(diGraph, landmarks)
 
 
     while i < amount:
@@ -109,21 +119,32 @@ def benchMarkAllAlgos(diGraph, amount):
             invalidTimes += 1
             continue
         dijkstraTimes.append(timeit.default_timer()-dijstraStartTime)
+        dijkstraVisitedList.append(dijkstraVisited)
 
         aStarStartTime = timeit.default_timer()
         aStarPath, aStarWeight, aStarVisited = AStar.aStar(diGraph, start, end)
         aStarTimes.append(timeit.default_timer()-aStarStartTime)
+        aStarVisitedList.append(aStarVisited)
 
         biDiDijkstraStartTime = timeit.default_timer()
         biDiDijkstraPath, biDiDijkstraWeight, biDiDijkstraVisited = BiDiDijstra.biDiDijkstra(diGraph, transPosedGraph, start, end)
         biDiDijkstraTimes.append(timeit.default_timer()-biDiDijkstraStartTime)
+        biDiDijkstraVisitedList.append(biDiDijkstraVisited)
+
+        ALTStartTime = timeit.default_timer()
+        ALTPath, ALTWeight, ALTVisited = ALT.ALT(diGraph, start, end, landmarkDistances)
+        ALTTimes.append(timeit.default_timer()-ALTStartTime)
+        ALTVistedList.append(ALTVisited)
+
+        allWeights = [dijkstraWeight, aStarWeight, biDiDijkstraWeight, ALTWeight]
 
         ##Check if the length of the paths are within 2 meters of each other
-        if abs(dijkstraWeight - aStarWeight) > 0.002 or abs(dijkstraWeight - biDiDijkstraWeight) > 0.002 or abs(aStarWeight - biDiDijkstraWeight) > 0.002:
+        if max(allWeights) - min(allWeights) > 0.002:
             print("Invalid path lengths")
             print(f"Dijkstra: {dijkstraWeight}")
             print(f"A*: {aStarWeight}")
             print(f"BiDiDijkstra: {biDiDijkstraWeight}")
+            print(f"ALT: {ALTWeight}")
             print(f"Start: {start}")
             print(f"End: {end}")
             print("--------------------------------------------------")
@@ -131,11 +152,12 @@ def benchMarkAllAlgos(diGraph, amount):
         else:
             i += 1
 
-    return dijkstraTimes, aStarTimes, biDiDijkstraTimes
+    dijkstraInfo = [dijkstraTimes, dijkstraVisitedList]
+    aStarInfo = [aStarTimes, aStarVisitedList]
+    biDiDijkstraInfo = [biDiDijkstraTimes, biDiDijkstraVisitedList]
+    ALTInfo = [ALTTimes, ALTVistedList]
 
-
-
-
+    return dijkstraInfo, aStarInfo, biDiDijkstraInfo, ALTInfo, invalidTimes
 
 
 if __name__ == '__main__':
@@ -157,7 +179,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    algorithms = {"dijkstra", "astar", "bididijkstra"}
+    algorithms = {"dijkstra", "astar", "bididijkstra", "ALT"}
 
     if args.algorithm not in algorithms and args.algorithm != "all":
         print("Invalid algorithm")
@@ -170,10 +192,16 @@ if __name__ == '__main__':
     print(f"Running benchmark for {args.algorithm}")
 
     if args.algorithm == "all":
-        dijkstraTimes, aStarTimes, biDiDijkstraTimes = benchMarkAllAlgos(diGraph, args.amount)
-        print(f"Average time for Dijkstra: {sum(dijkstraTimes)/len(dijkstraTimes)}")
-        print(f"Average time for A*: {sum(aStarTimes)/len(aStarTimes)}")
-        print(f"Average time for BiDiDijkstra: {sum(biDiDijkstraTimes)/len(biDiDijkstraTimes)}")
+        dijstraInfo, aStarInfo, biDiDijkstraInfo, ALTinfo, invalidPaths = benchMarkAllAlgos(diGraph, args.amount)
+        print(f"Average time for Dijkstra: {sum(dijstraInfo[0])/len(dijstraInfo[0])}")
+        print(f"Average nodes visited for Dijkstra: {sum(dijstraInfo[1])/len(dijstraInfo[1])}")
+        print(f"Average time for A*: {sum(aStarInfo[0])/len(aStarInfo[0])}")
+        print(f"Average nodes visited for A*: {sum(aStarInfo[1])/len(aStarInfo[1])}")
+        print(f"Average time for BiDiDijkstra: {sum(biDiDijkstraInfo[0])/len(biDiDijkstraInfo[0])}")
+        print(f"Average nodes visited for BiDiDijkstra: {sum(biDiDijkstraInfo[1])/len(biDiDijkstraInfo[1])}")
+        print(f"Average time for ALT: {sum(ALTinfo[0])/len(ALTinfo[0])}")
+        print(f"Average nodes visited for ALT: {sum(ALTinfo[1])/len(ALTinfo[1])}")
+        print(f"Amount of invalid paths found: {invalidPaths}")
 
     else:
         times, invalidTimes = benchMarkSingleAlgo(diGraph, args.algorithm, args.amount)

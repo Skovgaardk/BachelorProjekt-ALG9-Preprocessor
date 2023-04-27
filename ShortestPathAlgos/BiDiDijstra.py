@@ -18,9 +18,9 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
     visitedForward = set()
     visitedBackward = set()
 
-    openForward = [(0, sourceNode)]
+    openForward = [(0, sourceNode.id, sourceNode)]
     forwardDist = {sourceNode.id: 0}
-    openBackward = [(0, targetNode)]
+    openBackward = [(0, targetNode.id, targetNode)]
     backwardDist = {targetNode.id: 0}
 
     prevDictForward = dict()
@@ -29,8 +29,7 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
     intercept = None
     while openForward and openBackward:
     ## forward search
-        _, min_node = hq.heappop(openForward)
-        min_node_id = min_node.id
+        _, min_node_id, min_node = hq.heappop(openForward)
         if min_node_id in visitedForward:
             continue
         visitedForward.add(min_node_id)
@@ -39,7 +38,7 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
             if adj.id not in forwardDist or new_dist < forwardDist[adj.id]:
                 forwardDist[adj.id] = new_dist
                 prevDictForward[adj.id] = min_node
-                hq.heappush(openForward, (new_dist, adj))
+                hq.heappush(openForward, (new_dist, adj.id, adj))
 
         # backward search
         _, min_node = hq.heappop(openBackward)
@@ -52,31 +51,30 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
             if adj.id not in backwardDist or new_dist < backwardDist[adj.id]:
                 backwardDist[adj.id] = new_dist
                 prevDictBackward[adj.id] = min_node
-                hq.heappush(openBackward, (new_dist, adj))
+                hq.heappush(openBackward, (new_dist, adj.id, adj))
 
         # the queue is empty, there is no path
         if not openForward or not openBackward:
             return None, None, None
 
-        if openForward[0][1].id in backwardDist:
-            intercept = openForward[0][1]
+        if openForward[0][2].id in visitedBackward:
+            intercept = openForward[0][2]
             break
 
-        if openBackward[0][1].id in forwardDist:
-            intercept = openBackward[0][1]
+        if openBackward[0][2].id in visitedForward:
+            intercept = openBackward[0][2]
             break
 
     best_dist = forwardDist[intercept.id] + backwardDist[intercept.id]
 
     while openForward:
-        dist, min_node = hq.heappop(openForward)
+        dist, min_node_id, min_node = hq.heappop(openForward)
         if min_node.id in backwardDist:
             new_dist = dist + backwardDist[min_node.id]
             if new_dist < best_dist:
                 intercept = min_node
                 best_dist = new_dist
                 forwardDist[intercept.id] = dist
-                print("found better intercept")
 
 
     weight = forwardDist[intercept.id] + backwardDist[intercept.id]

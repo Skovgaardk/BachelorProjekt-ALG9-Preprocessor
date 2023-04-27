@@ -10,13 +10,13 @@ def dijkstra(graph, source, target):
 
     visited = set()
 
-    queue = [(0, source)]
+    queue = [(0, source.id, source)]
     while True:
         # the queue is empty, there is no path
         if not queue:
             return None, None, None
 
-        min_dist, min_node = hq.heappop(queue)
+        min_dist, id, min_node = hq.heappop(queue)
         if min_node in visited:
             continue
         visited.add(min_node)
@@ -44,7 +44,7 @@ def relax(min_node, adj, weight, not_visited):
     if new_dist < adj.distance:
         adj.distance = new_dist
         adj.previous = min_node
-        hq.heappush(not_visited, (new_dist, adj))
+        hq.heappush(not_visited, (new_dist, adj.id, adj))
 
 
 def calculatePath(target):
