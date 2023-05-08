@@ -61,8 +61,10 @@ def RunAfterGraphLoaded():
 
     print("please enter the start node")
     startNode = input("Enter the start node: ")
+    startNode = startNode.strip()
     print("please enter the end node")
     endNode = input("Enter the end node: ")
+    endNode = endNode.strip()
 
     print("Running algorithm...")
     runAlgorithm(ListOfAlgorithms[int(userInput)], diGraph, startNode, endNode)

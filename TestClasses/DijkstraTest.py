@@ -4,6 +4,8 @@ from ShortestPathAlgos import Dijkstra
 import Util.Graphs as Graphs
 import timeit
 
+from Util import Nodes
+
 
 
 class DijkstraTest(unittest.TestCase):
@@ -61,8 +63,6 @@ class DijkstraTest(unittest.TestCase):
         self.assertEqual(path[3].id, 5)
         self.assertEqual(path[4].id, 4)
         self.assertEqual(weight, 21)
-
-
 
 def main():
     unittest.main()

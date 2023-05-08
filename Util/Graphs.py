@@ -1,7 +1,6 @@
-import numpy as np
+
 from math import sin, cos, sqrt, atan2, radians
 import Util.Nodes as Nodes
-from collections import defaultdict
 
 class Graph:
     def __init__(self):

@@ -80,10 +80,10 @@ class ALTTest(unittest.TestCase):
 
         print("Landmark Distances:")
         print(landmarkDistances)
-        for landmark in landmarkDistances.keys():
+        for landmark in landmarkDistances:
             print("Landmark: " + str(landmark))
-            print("To distances", landmarkDistances[landmark][0])
-            print("From distances", landmarkDistances[landmark][1])
+            print("To distances", landmark.toLandmark)
+            print("From distances", landmark.fromLandmark)
 
 
 
@@ -135,10 +135,13 @@ class ALTTest(unittest.TestCase):
 
         print("Landmark Distances:")
         print(landmarkDistances)
-        for landmark in landmarkDistances.keys():
+        for landmark in landmarkDistances:
             print("Landmark: " + str(landmark))
-            print("To distances", landmarkDistances[landmark][0])
-            print("From distances", landmarkDistances[landmark][1])
+            print("To distances", landmark.toLandmark)
+            print("From distances", landmark.fromLandmark)
+
+
+
 
 
         start = timeit.default_timer()
@@ -185,21 +188,21 @@ class ALTTest(unittest.TestCase):
 
         print("Landmark Distances:")
         print(landmarkDistances)
-        for landmark in landmarkDistances.keys():
+        for landmark in landmarkDistances:
             print("Landmark: " + str(landmark))
-            print("To distances", landmarkDistances[landmark][0])
-            print("From distances", landmarkDistances[landmark][1])
+            print("To distances", landmark.toLandmark)
+            print("From distances", landmark.fromLandmark)
 
 
         anyIsNotExistant = False
-        for landmark in landmarkDistances.keys():
+        for landmark in landmarkDistances:
             for node in graph.nodeList:
                 print("Checking if node " + str(node))
-                print("landmark to distances: ", landmarkDistances[landmark][0].keys())
-                print("landmark from distances: ", landmarkDistances[landmark][1].keys())
-                if node not in landmarkDistances[landmark][0].keys():
+                print("landmark to distances: ", landmark.toLandmark.keys())
+                print("landmark from distances: ", landmark.fromLandmark.keys())
+                if node not in landmark.toLandmark.keys():
                     anyIsNotExistant = True
-                if node not in landmarkDistances[landmark][1].keys():
+                if node not in landmark.fromLandmark.keys():
                     anyIsNotExistant = True
 
         self.assertFalse(anyIsNotExistant)

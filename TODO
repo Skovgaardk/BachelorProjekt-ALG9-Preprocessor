@@ -12,6 +12,7 @@ VIGTIGT:
 
 Ikke så vigtigt:
     - Måske kigge på en måde at fjerne nogle af de unødvendige nodes på
+    - fix lige så vi ikke køre initSingleSource i aStar
 
 
 

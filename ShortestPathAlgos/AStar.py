@@ -26,7 +26,6 @@ def aStar(graph, source, target, heuristic = "euclidean"):
     visited = set()
 
     # While current vertex is not the destination vertex
-    iteration = 0
     while True:
 
         # If openList is empty, then there is no path from source to target
@@ -38,7 +37,7 @@ def aStar(graph, source, target, heuristic = "euclidean"):
         openListSetId.remove(min_node.id)
 
         closedListSetId.add(min_node.id)
-        iteration += 1
+
 
         if min_node == target:
             break

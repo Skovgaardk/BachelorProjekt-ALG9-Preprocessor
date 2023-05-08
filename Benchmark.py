@@ -99,10 +99,11 @@ def benchMarkAllAlgos(diGraph, amount):
 
     transPosedGraph = Util.Graphs.transposeDiGraph(diGraph)
 
-    landmarks = ALT.findLandmarks(diGraph, 16)
+    landmarks = ALT.findLandmarks(diGraph, 3)
 
     landmarkDistances = ALT.calculateLandmarkDistances(diGraph, landmarks)
 
+    wrongWays = 0
 
     while i < amount:
 
@@ -140,7 +141,7 @@ def benchMarkAllAlgos(diGraph, amount):
 
         ##Check if the length of the paths are within 2 meters of each other
         if max(allWeights) - min(allWeights) > 0.002:
-            print("Invalid path lengths")
+            print("Wrong path lengths")
             print(f"Dijkstra: {dijkstraWeight}")
             print(f"A*: {aStarWeight}")
             print(f"BiDiDijkstra: {biDiDijkstraWeight}")
@@ -148,6 +149,7 @@ def benchMarkAllAlgos(diGraph, amount):
             print(f"Start: {start}")
             print(f"End: {end}")
             print("--------------------------------------------------")
+            wrongWays += 1
             i += 1
         else:
             i += 1
@@ -157,19 +159,26 @@ def benchMarkAllAlgos(diGraph, amount):
     biDiDijkstraInfo = [biDiDijkstraTimes, biDiDijkstraVisitedList]
     ALTInfo = [ALTTimes, ALTVistedList]
 
-    return dijkstraInfo, aStarInfo, biDiDijkstraInfo, ALTInfo, invalidTimes
+    return dijkstraInfo, aStarInfo, biDiDijkstraInfo, ALTInfo, invalidTimes, wrongWays
 
 
 if __name__ == '__main__':
 
-    # graph = DataManager.read_DiGrapgh_from_Parquet("ProcessedGraphs/lta-latest.parquet")
+    # graph = DataManager.read_DiGrapgh_from_Parquet("ProcessedGraphs/malta-latest.parquet")
     #
     # transPosedGraph = Util.Graphs.transposeDiGraph(graph)
     #
+    # landmarks = ALT.findLandmarks(graph, 16)
+    #
+    # landmarkDistances = ALT.calculateLandmarkDistances(graph, landmarks)
+    #
     # lp = LineProfiler()
-    # lp.add_function(BiDiDijstra.biDiDijkstra)
-    # lp_wrapper = lp(BiDiDijstra.biDiDijkstra)
-    # lp_wrapper(graph, transPosedGraph, graph.nodeList["9067296420"], graph.nodeList["382980629"])
+    # lp.add_function(ALT.ALT)
+    # lp.add_function(ALT.findBestLowerBound)
+    # lp_wrapper = lp(ALT.ALT)
+    # lp_wrapper(graph, graph.nodeList["9067296420"], graph.nodeList["382980629"], landmarkDistances)
+    # lp_wrapper = lp(ALT.findBestLowerBound)
+    # lp_wrapper(graph.nodeList["10028683375"], graph.nodeList["382980629"], landmarks)
     # lp.print_stats()
 
     parser = argparse.ArgumentParser(description='argparser for shortest path program')
@@ -192,7 +201,7 @@ if __name__ == '__main__':
     print(f"Running benchmark for {args.algorithm}")
 
     if args.algorithm == "all":
-        dijstraInfo, aStarInfo, biDiDijkstraInfo, ALTinfo, invalidPaths = benchMarkAllAlgos(diGraph, args.amount)
+        dijstraInfo, aStarInfo, biDiDijkstraInfo, ALTinfo, invalidPaths, wrongWays = benchMarkAllAlgos(diGraph, args.amount)
         print(f"Average time for Dijkstra: {sum(dijstraInfo[0])/len(dijstraInfo[0])}")
         print(f"Average nodes visited for Dijkstra: {sum(dijstraInfo[1])/len(dijstraInfo[1])}")
         print(f"Average time for A*: {sum(aStarInfo[0])/len(aStarInfo[0])}")
@@ -202,6 +211,8 @@ if __name__ == '__main__':
         print(f"Average time for ALT: {sum(ALTinfo[0])/len(ALTinfo[0])}")
         print(f"Average nodes visited for ALT: {sum(ALTinfo[1])/len(ALTinfo[1])}")
         print(f"Amount of invalid paths found: {invalidPaths}")
+        print(f"Amount of wrong ways found: {wrongWays}")
+        print(f"Percent of wrong ways: {wrongWays/args.amount*100}%")
 
     else:
         times, invalidTimes = benchMarkSingleAlgo(diGraph, args.algorithm, args.amount)

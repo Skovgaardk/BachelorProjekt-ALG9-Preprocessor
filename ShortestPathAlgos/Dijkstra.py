@@ -1,12 +1,12 @@
 import sys
 
+
 import heapq as hq
 
 
 def dijkstra(graph, source, target):
 
-
-    initSingleSource(graph.nodeList.values(), source)
+    initSingleSource(graph, source)
 
     visited = set()
 
@@ -33,7 +33,7 @@ def dijkstra(graph, source, target):
 
 
 def initSingleSource(graph, source):
-    for node in graph:
+    for node in graph.nodeList.values():
         node._distance = float('inf')
         node._previous = None
     source._distance = 0

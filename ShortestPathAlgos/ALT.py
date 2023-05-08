@@ -3,6 +3,8 @@ import math
 import Util.Nodes as Node
 import Util.Graphs as Graph
 import heapq as hq
+import numba
+from numba import jit
 
 from ShortestPathAlgos import Dijkstra
 
@@ -42,16 +44,28 @@ def findLandmarks(graph, quadrantSize=16):
         index = int(angle / angles)
         quadrants[index].append(node)
 
-
     landmarks = []
-    #Iterate through the quardrants and find the node with the largest distance from the center node
 
+    # Find node closest to the mean Latitude overall
+    minDistance = 100000000
+    minNode = None
+    for node in graph.nodeList.values():
+       distance = math.sqrt((node.lat - meanLatitude)**2 + (node.lon - meanLongitude)**2)
+       if distance < minDistance:
+           minDistance = distance
+           minNode = node
+
+    # Calculate the distance from the middle node to every other node
+    distances = DijkstraNoTarget(graph, minNode)
+
+    # Find the node furthest away from the middle node
     maxNode = None
     for quadrant in quadrants:
         maxDistance = 0
         for node in quadrant:
-            distance = math.sqrt((node.lat - meanLatitude)**2 + (node.lon - meanLongitude)**2)
-            if distance > maxDistance:
+            distance = distances[node.id]
+            #Need to ignore nodes where distance is infinity or 0
+            if distance > maxDistance and distance != 0 and distance != float('inf'):
                 maxDistance = distance
                 maxNode = node
         if maxNode is not None:
@@ -69,33 +83,34 @@ def calculateLandmarkDistances(graph, landmarks):
     :return:
     '''
 
-    listOfLandmarkDistances = {landmark.id: {} for landmark in landmarks}
 
     transPosedGraph = Graph.transposeDiGraph(graph)
 
     for landmark in landmarks:
-        distancesTo = DijkstraNoTarget(graph, landmark)
-        distancesFrom = DijkstraNoTarget(transPosedGraph, landmark)
+        distancesFromLandmarkToNodes = DijkstraNoTarget(graph, landmark)
+        distancesFromNodesToLandmark = DijkstraNoTarget(transPosedGraph, landmark)
 
-        landmarkDistances = (distancesTo, distancesFrom)
+        landmark.fromLandmark = distancesFromLandmarkToNodes
+        landmark.toLandmark = distancesFromNodesToLandmark
 
-        listOfLandmarkDistances[landmark.id] = landmarkDistances
+    return landmarks
 
-    return listOfLandmarkDistances
 
-def findBestLowerBound(neighbor, landmarks, node):
+def findBestLowerBound(node, target, landmarks):
     #max(d(l,u) - d(l,v), d(v,l) - d(u,l) for all l in landmarks
 
-    bestLowerbound = -1000000
     bestLandmark = None
-    for landmark in landmarks.values():
-        lowerBound = max(abs(landmark[0][node.id] - landmark[0][neighbor.id]), abs(landmark[1][neighbor.id] - landmark[1][node.id]))
-        if lowerBound > bestLowerbound:
-            bestLowerbound = lowerBound
+    maxLowerBound = float('-inf')
+
+    for landmark in landmarks:
+        lowerBound = max(
+            abs(landmark.toLandmark[node.id] - landmark.toLandmark[target.id]),
+            abs(landmark.fromLandmark[node.id] - landmark.fromLandmark[target.id]))
+        if lowerBound > maxLowerBound:
+            maxLowerBound = lowerBound
             bestLandmark = landmark
 
     return bestLandmark
-
 
 def ALT(graph, start, end, landmarks):
 
@@ -107,6 +122,8 @@ def ALT(graph, start, end, landmarks):
     closedSet = set()
 
     openSet = [(0, startNode.id, startNode)]
+    openSetIds = set()
+    openSetIds.add(startNode.id)
 
     fromSet = {}
     fromSet[startNode.id] = None
@@ -114,44 +131,47 @@ def ALT(graph, start, end, landmarks):
     gScore = {node.id: float('inf') for node in graph.nodeList.values()}
     gScore[startNode.id] = 0
 
-    #Map every node to infinite distance
-    fScoreList = {node.id: float('inf') for node in graph.nodeList.values()}
-    fScoreList[startNode.id] = 0
-
-
-    iteration = 0
     while openSet:
 
+        if not openSet:
+            return None, None, None
+
         current = hq.heappop(openSet)[2]
-
-        if current == endNode:
-            break
-
         closedSet.add(current)
+
+        if current.id == endNode.id:
+            break
 
         for neighbor, weight in current.adjacent.items():
 
             if neighbor in closedSet:
                 continue
 
-            landmark = findBestLowerBound(neighbor, landmarks, current)
+            GScore = gScore[current.id] + weight
 
-            tentativeGScore = gScore[current.id] + weight
+            if neighbor.id not in openSetIds:
+                landmark = findBestLowerBound(neighbor, endNode, landmarks)
+                f = GScore - abs(landmark.toLandmark[current.id] - landmark.toLandmark[neighbor.id])
+                gScore[neighbor.id] = GScore
+                fromSet[neighbor.id] = current
+                openSetIds.add(neighbor.id)
+                hq.heappush(openSet, (f, neighbor.id, neighbor))
 
-            ## wægt + abs(d(l,u) - d(t, l))
+            else:
+                if GScore < gScore[neighbor.id]:
+                    landmark = findBestLowerBound(neighbor, endNode, landmarks)
+                    f = GScore - abs(landmark.toLandmark[current.id] - landmark.toLandmark[neighbor.id])
+                    gScore[neighbor.id] = GScore
+                    fromSet[neighbor.id] = current
+                    for i, (fValue, id, node) in enumerate(openSet):
+                        if id == neighbor.id:
+                            openSet[i] = (f, neighbor.id, neighbor)
+                            hq.heapify(openSet)
+                            break
 
-            fscore = tentativeGScore + abs(landmark[0][neighbor.id] - landmark[1][endNode.id])
-
-            if not openSet or neighbor not in [node[2] for node in openSet]:
-                hq.heappush(openSet, (fscore, neighbor.id, neighbor))
-            elif tentativeGScore > gScore[neighbor.id]:
-                continue
-
-            fromSet[neighbor.id] = current
-            gScore[neighbor.id] = tentativeGScore
-            fScoreList[neighbor.id] = fscore
 
     return calculatePath(fromSet, endNode), gScore[endNode.id], len(closedSet)
+
 def calculatePath(fromSet, endNode):
     path = []
     node = endNode

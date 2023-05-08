@@ -10,6 +10,8 @@ class Node:
         self._previous = None
         self.priority = 0
         self.heuristicDist = 0
+        self.toLandmark = {}
+        self.fromLandmark = {}
 
     @property
     def id(self):
@@ -65,6 +67,17 @@ class Node:
     def heuristicDist(self, heuristicDist):
         self._heuristicDist = heuristicDist
 
+    def addToLandmark(self, landmark, distance):
+        self.toLandmark[landmark] = distance
+
+    def addFromLandmark(self, landmark, distance):
+        self.fromLandmark[landmark] = distance
+
+    def getToLandmark(self, landmark):
+        return self.toLandmark[landmark]
+
+    def getFromLandmark(self, landmark):
+        return self.fromLandmark[landmark]
     def __str__(self):
         return str(self.id) + ' adjacent: ' + str([x.id for x in self.adjacent])
 
