@@ -1,15 +1,12 @@
 import math
 
-import Util.Nodes as Node
+
 import Util.Graphs as Graph
 import heapq as hq
-import numba
-from numba import jit
-
-from ShortestPathAlgos import Dijkstra
+import random
 
 
-def findLandmarks(graph, quadrantSize=16):
+def quadrantLandmarks(graph, amountOfLandmarks):
     latitudes = []
     longitudes = []
     for node in graph.nodeList.values():
@@ -24,9 +21,9 @@ def findLandmarks(graph, quadrantSize=16):
     meanLongitude = sumOfLongitudes / len(longitudes)
 
     #Create 16 quardrants
-    quadrants = [[] for _ in range(quadrantSize)]
+    quadrants = [[] for _ in range(amountOfLandmarks)]
 
-    angles = 360 / quadrantSize
+    angles = 360 / amountOfLandmarks
 
     #Iterate through the nodes and add them to the correct quadrant
     for node in graph.nodeList.values():
@@ -72,18 +69,6 @@ def findLandmarks(graph, quadrantSize=16):
             landmarks.append(maxNode)
             maxNode = None
 
-    return landmarks
-
-
-def calculateLandmarkDistances(graph, landmarks):
-    '''
-    Calculate the distance from each node to each landmark
-    :param graph:
-    :param landmarks:
-    :return:
-    '''
-
-
     transPosedGraph = Graph.transposeDiGraph(graph)
 
     for landmark in landmarks:
@@ -94,6 +79,69 @@ def calculateLandmarkDistances(graph, landmarks):
         landmark.toLandmark = distancesFromNodesToLandmark
 
     return landmarks
+
+
+def randomLandmarks(graph, amountOfLandmarks):
+    landmarks = []
+    for i in range(amountOfLandmarks):
+        randomNode = random.choice(list(graph.nodeList.values()))
+        landmarks.append(randomNode)
+
+    transPosedGraph = Graph.transposeDiGraph(graph)
+    for landmark in landmarks:
+        distancesFromLandmarkToNodes = DijkstraNoTarget(graph, landmark)
+        distancesFromNodesToLandmark = DijkstraNoTarget(transPosedGraph, landmark)
+
+        landmark.fromLandmark = distancesFromLandmarkToNodes
+        landmark.toLandmark = distancesFromNodesToLandmark
+
+    return landmarks
+
+
+def farthestLandmarks(graph, amountOfLandmarks):
+
+    transPosedGraph = Graph.transposeDiGraph(graph)
+
+    startLandMark = random.choice(list(graph.nodeList.values()))
+
+    landmarks = set()
+    landmarks.add(startLandMark)
+
+    startLandMark.toLandmark = DijkstraNoTarget(transPosedGraph, startLandMark)
+    startLandMark.fromLandmark = DijkstraNoTarget(graph, startLandMark)
+
+    for i in range(amountOfLandmarks):
+
+        maxDist = 0
+        maxNode = None
+
+        for landmark in landmarks:
+            toLandMarkDist = landmark.toLandmark
+            for dist in toLandMarkDist.values():
+                if dist > maxDist:
+                    maxDist = dist
+                    maxNode = landmark
+
+        maxNode.fromLandmark = DijkstraNoTarget(graph, maxNode)
+        maxNode.toLandmark = DijkstraNoTarget(transPosedGraph, maxNode)
+        landmarks.add(maxNode)
+
+    return landmarks
+
+def findLandmarks(graph, amountOfLandmarks, heuristic="quadrants"):
+
+    if heuristic == "quadrants":
+        landmarks = quadrantLandmarks(graph, amountOfLandmarks)
+        return landmarks
+    elif heuristic == "random":
+        landmarks = randomLandmarks(graph, amountOfLandmarks)
+        return landmarks
+    elif heuristic == "farthest":
+        landmarks = farthestLandmarks(graph, amountOfLandmarks)
+        print("landmarks returned:")
+        for landmark in landmarks:
+            print(landmark.id)
+        return landmarks
 
 
 def findBestLowerBound(node, target, landmarks):
@@ -111,6 +159,41 @@ def findBestLowerBound(node, target, landmarks):
             bestLandmark = landmark
 
     return bestLandmark
+
+
+def findThreeBestLandmarks(startNode, endNode, landmarks):
+
+    bestLandmarks = []
+
+    for landmark in landmarks:
+
+        lowerBound = max(
+            abs(landmark.toLandmark[startNode.id] - landmark.toLandmark[endNode.id]),
+            abs(landmark.fromLandmark[endNode.id] - landmark.fromLandmark[startNode.id]))
+
+        bestLandmarks.append((lowerBound, landmark))
+
+    bestLandmarks.sort(key=lambda x: x[0], reverse=True)
+
+    return [landmark[1] for landmark in bestLandmarks[:3]]
+
+
+def calculateFHeuristicDistance(current, neighbor, landmarks):
+    #h(u) = d(u,l) - d(s,l) for l in landmarks
+
+    #Find the best landmark for the neighbor
+    heuristicDist = float('inf')
+    landmarkUsed = None
+    for landmark in landmarks:
+        dist = abs(landmark.toLandmark[current.id] - landmark.toLandmark[neighbor.id])
+        #If the distance found is less than the current heuristic distance, update the heuristic distance
+        if dist < heuristicDist:
+            heuristicDist = dist
+            landmarkUsed = landmark
+
+    return heuristicDist
+
+
 
 def ALT(graph, start, end, landmarks):
 
@@ -131,6 +214,8 @@ def ALT(graph, start, end, landmarks):
     gScore = {node.id: float('inf') for node in graph.nodeList.values()}
     gScore[startNode.id] = 0
 
+    landmarks = findThreeBestLandmarks(startNode, endNode, landmarks)
+
     while openSet:
 
         if not openSet:
@@ -150,8 +235,9 @@ def ALT(graph, start, end, landmarks):
             GScore = gScore[current.id] + weight
 
             if neighbor.id not in openSetIds:
-                landmark = findBestLowerBound(neighbor, endNode, landmarks)
-                f = GScore - abs(landmark.toLandmark[current.id] - landmark.toLandmark[neighbor.id])
+                # W'(u,v) = w(u,v) + h(u) - h(v)
+                heuristicDist = calculateFHeuristicDistance(current, neighbor, landmarks)
+                f = GScore + heuristicDist
                 gScore[neighbor.id] = GScore
                 fromSet[neighbor.id] = current
                 openSetIds.add(neighbor.id)
@@ -159,8 +245,8 @@ def ALT(graph, start, end, landmarks):
 
             else:
                 if GScore < gScore[neighbor.id]:
-                    landmark = findBestLowerBound(neighbor, endNode, landmarks)
-                    f = GScore - abs(landmark.toLandmark[current.id] - landmark.toLandmark[neighbor.id])
+                    heuristicDist = calculateFHeuristicDistance(current, neighbor, landmarks)
+                    f = GScore + heuristicDist
                     gScore[neighbor.id] = GScore
                     fromSet[neighbor.id] = current
                     for i, (fValue, id, node) in enumerate(openSet):

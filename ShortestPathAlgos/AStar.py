@@ -68,12 +68,6 @@ def aStar(graph, source, target, heuristic = "euclidean"):
                             hq.heapify(openList)
                             break
 
-            # if adj.id == target.id:
-            #     adj._distance = min_node._distance + weight
-            #     adj._previous = min_node
-            #     path = calculatePath(target)
-            #     return path, len(closedListSetId)
-
     weight = target.distance
 
     return calculatePath(target), weight, len(visited)

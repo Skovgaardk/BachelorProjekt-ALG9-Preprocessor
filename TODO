@@ -7,8 +7,8 @@ Pedestrian, Access*, Busway, (Escape mby), Bus_guideway, footway, bridleway, cor
 
 Backlog:
 VIGTIGT:
-    - Find ud af hvorfor vores lower bound / måde at udregne Fscore ikke er korrekt-
-    - Find ud af hvorfor den kører så langsomt (brug evt. det library som sidst)
+    - Optimer vores ALT algoritme
+    - Fiks vores "farthest" måde at finde landmarks på
 
 Ikke så vigtigt:
     - Måske kigge på en måde at fjerne nogle af de unødvendige nodes på

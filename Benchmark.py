@@ -69,6 +69,21 @@ def benchMarkSingleAlgo(diGraph, algorithm, amount):
             times.append(timeit.default_timer()-starTime)
             i += 1
 
+    elif algorithm == "alt":
+        i = 0
+        landmarks = ALT.findLandmarks(diGraph, 16)
+        while i < amount:
+
+            start = random.choice(list(diGraph.nodeList.values()))
+            end = random.choice(list(diGraph.nodeList.values()))
+
+            starTime = timeit.default_timer()
+            path, weight, visited = ALT.ALT(diGraph, start, end, landmarks)
+            if path is None:
+                invalidTimes += 1
+            times.append(timeit.default_timer()-starTime)
+            i += 1
+
     else:
         print("Invalid algorithm")
         exit()
@@ -99,9 +114,7 @@ def benchMarkAllAlgos(diGraph, amount):
 
     transPosedGraph = Util.Graphs.transposeDiGraph(diGraph)
 
-    landmarks = ALT.findLandmarks(diGraph, 3)
-
-    landmarkDistances = ALT.calculateLandmarkDistances(diGraph, landmarks)
+    landmarks = ALT.findLandmarks(diGraph, 32, "farthest")
 
     wrongWays = 0
 
@@ -133,7 +146,7 @@ def benchMarkAllAlgos(diGraph, amount):
         biDiDijkstraVisitedList.append(biDiDijkstraVisited)
 
         ALTStartTime = timeit.default_timer()
-        ALTPath, ALTWeight, ALTVisited = ALT.ALT(diGraph, start, end, landmarkDistances)
+        ALTPath, ALTWeight, ALTVisited = ALT.ALT(diGraph, start, end, landmarks)
         ALTTimes.append(timeit.default_timer()-ALTStartTime)
         ALTVistedList.append(ALTVisited)
 
@@ -168,15 +181,13 @@ if __name__ == '__main__':
     #
     # transPosedGraph = Util.Graphs.transposeDiGraph(graph)
     #
-    # landmarks = ALT.findLandmarks(graph, 16)
-    #
-    # landmarkDistances = ALT.calculateLandmarkDistances(graph, landmarks)
+    # landmarks = ALT.findLandmarks(graph, 10)
     #
     # lp = LineProfiler()
     # lp.add_function(ALT.ALT)
     # lp.add_function(ALT.findBestLowerBound)
     # lp_wrapper = lp(ALT.ALT)
-    # lp_wrapper(graph, graph.nodeList["9067296420"], graph.nodeList["382980629"], landmarkDistances)
+    # lp_wrapper(graph, graph.nodeList["9067296420"], graph.nodeList["382980629"], landmarks)
     # lp_wrapper = lp(ALT.findBestLowerBound)
     # lp_wrapper(graph.nodeList["10028683375"], graph.nodeList["382980629"], landmarks)
     # lp.print_stats()

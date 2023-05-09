@@ -76,11 +76,10 @@ class ALTTest(unittest.TestCase):
         for node in landmarks:
             print(node.id)
 
-        landmarkDistances = ALT.calculateLandmarkDistances(graph, landmarks)
 
         print("Landmark Distances:")
-        print(landmarkDistances)
-        for landmark in landmarkDistances:
+        print(landmarks)
+        for landmark in landmarks:
             print("Landmark: " + str(landmark))
             print("To distances", landmark.toLandmark)
             print("From distances", landmark.fromLandmark)
@@ -131,21 +130,14 @@ class ALTTest(unittest.TestCase):
 
         landmarks = [graph.nodeList[5]]
 
-        landmarkDistances = ALT.calculateLandmarkDistances(graph, landmarks)
+        transPosedGraph = Graphs.transposeDiGraph(graph)
 
-        print("Landmark Distances:")
-        print(landmarkDistances)
-        for landmark in landmarkDistances:
-            print("Landmark: " + str(landmark))
-            print("To distances", landmark.toLandmark)
-            print("From distances", landmark.fromLandmark)
-
-
-
+        landmarks[0].toLandmark = ALT.DijkstraNoTarget(transPosedGraph, landmarks[0])
+        landmarks[0].fromLandmark = ALT.DijkstraNoTarget(graph, landmarks[0])
 
 
         start = timeit.default_timer()
-        path, weight, len = ALT.ALT(graph, graph.nodeList[0], graph.nodeList[8], landmarkDistances)
+        path, weight, len = ALT.ALT(graph, graph.nodeList[0], graph.nodeList[8], landmarks)
         print("Time: ", (timeit.default_timer() - start)*1000)
 
         print("Path: ")
@@ -184,18 +176,21 @@ class ALTTest(unittest.TestCase):
 
         landmarks = [graph.nodeList[2]]
 
-        landmarkDistances = ALT.calculateLandmarkDistances(graph, landmarks)
+        transPosedGraph = Graphs.transposeDiGraph(graph)
+
+        landmarks[0].toLandmark = ALT.DijkstraNoTarget(transPosedGraph, landmarks[0])
+        landmarks[0].fromLandmark = ALT.DijkstraNoTarget(graph, landmarks[0])
 
         print("Landmark Distances:")
-        print(landmarkDistances)
-        for landmark in landmarkDistances:
+        print(landmarks)
+        for landmark in landmarks:
             print("Landmark: " + str(landmark))
             print("To distances", landmark.toLandmark)
             print("From distances", landmark.fromLandmark)
 
 
         anyIsNotExistant = False
-        for landmark in landmarkDistances:
+        for landmark in landmarks:
             for node in graph.nodeList:
                 print("Checking if node " + str(node))
                 print("landmark to distances: ", landmark.toLandmark.keys())

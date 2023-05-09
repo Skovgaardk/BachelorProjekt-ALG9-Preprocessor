@@ -25,12 +25,10 @@ def runAlgorithm(algorithm, diGraph, startNode, endNode):
         print("Time to run Bidirectional Dijkstra: ", timeit.default_timer() - startTime4)
     elif algorithm == "ALT":
 
-        landmarks = ALT.findLandmarks(diGraph, 16)
-
-        landmarkList = ALT.calculateLandmarkDistances(diGraph, landmarks)
+        landmarks = ALT.findLandmarks(diGraph, 16, heuristic="quadrants")
 
         startTime5 = timeit.default_timer()
-        path, weight, visited = ALT.ALT(diGraph, diGraph.nodeList[startNode], diGraph.nodeList[endNode], landmarkList)
+        path, weight, visited = ALT.ALT(diGraph, diGraph.nodeList[startNode], diGraph.nodeList[endNode], landmarks)
         print("Time to run ALT: ", timeit.default_timer() - startTime5)
 
     if path is None:
