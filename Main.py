@@ -90,6 +90,10 @@ if __name__ == '__main__':
     userInput = input("Enter the number of the graph you want to load: ")
     print("You selected: ", listOfProcessedGraphs[int(userInput)])
 
+    if not os.path.exists("ProcessedGraphs/" + listOfProcessedGraphs[int(userInput)] + ".parquet"):
+        print("The graph you selected does not exist")
+        exit()
+
     # Load the graph
     diGraph = DataManager.read_DiGrapgh_from_Parquet("ProcessedGraphs/" + listOfProcessedGraphs[int(userInput)] + ".parquet")
 

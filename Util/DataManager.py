@@ -24,14 +24,17 @@ def write_DiGraph_to_file_Parquet(graph, filename):
         if not os.path.exists(parent_dir):
             os.mkdir(filename)
 
+
         file_path = os.path.join(parent_dir, filename + ".parquet")
 
-        super.to_parquet(file_path, index=False)
+        super.to_parquet(file_path,engine="fastparquet")
+
 
 
 def read_DiGrapgh_from_Parquet(filename):
     start = timeit.default_timer()
-    df = pd.read_parquet(filename)
+    print("got here")
+    df = pd.read_parquet(filename, engine="fastparquet")
     print("Time to read graph: ", timeit.default_timer() - start)
 
     print("Converting to graph...")

@@ -33,6 +33,8 @@ if __name__ == '__main__':
     print("Writing DiGraph to file...")
     DataManager.write_DiGraph_to_file_Parquet(diGraph, mapname)
 
+    print("preprocessing done!")
+
 
 
 
