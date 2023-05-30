@@ -151,11 +151,11 @@ def findBestLowerBound(node, target, landmarks):
     maxLowerBound = float('-inf')
 
     for landmark in landmarks:
-        lowerBound = max(
-            abs(landmark.toLandmark[node.id] - landmark.toLandmark[target.id]),
-            abs(landmark.fromLandmark[node.id] - landmark.fromLandmark[target.id]))
-        if lowerBound > maxLowerBound:
-            maxLowerBound = lowerBound
+        dist1 = abs(landmark.fromLandmark[node.id] - landmark.fromLandmark[target.id])
+        dist2 = abs(landmark.toLandmark[target.id] - landmark.toLandmark[node.id])
+        dist = max(dist1, dist2)
+        if dist > maxLowerBound:
+            maxLowerBound = dist
             bestLandmark = landmark
 
     return bestLandmark
@@ -178,101 +178,99 @@ def findThreeBestLandmarks(startNode, endNode, landmarks):
     return [landmark[1] for landmark in bestLandmarks[:3]]
 
 
-def calculateFHeuristicDistance(current, neighbor, landmarks):
+def calculateFHeuristicDistance(neighbor, target, landmarks):
     #h(u) = d(u,l) - d(s,l) for l in landmarks
 
     #Find the best landmark for the neighbor
-    heuristicDist = float('inf')
-    landmarkUsed = None
+    heuristicDist = float('-inf')
     for landmark in landmarks:
-        dist = abs(landmark.toLandmark[current.id] - landmark.toLandmark[neighbor.id])
+        dist1 = landmark.toLandmark[neighbor.id] - landmark.toLandmark[target.id]
+        dist2 = landmark.fromLandmark[target.id] - landmark.fromLandmark[neighbor.id]
+        dist = max(dist1, dist2)
         #If the distance found is less than the current heuristic distance, update the heuristic distance
-        if dist < heuristicDist:
+        if dist > heuristicDist:
             heuristicDist = dist
-            landmarkUsed = landmark
 
     return heuristicDist
 
 
 
+
 def ALT(graph, start, end, landmarks):
+    initSingleSource(graph.nodeList.values(), start)
 
-    startNode = graph.nodeList[start.id]
-    endNode = graph.nodeList[end.id]
+    start.heuristic = calculateFHeuristicDistance(start, end, landmarks)
 
-    startNode.distance = 0
+    openList = [(start.heuristic, 0, start)]
+    openListSetId = {start.id}
+    closedListSetId = set()
 
-    closedSet = set()
+    visited = set()
 
-    openSet = [(0, startNode.id, startNode)]
-    openSetIds = set()
-    openSetIds.add(startNode.id)
+    landmarks = findThreeBestLandmarks(start, end, landmarks)
 
-    fromSet = {}
-    fromSet[startNode.id] = None
+    # While current vertex is not the destination vertex
+    while True:
 
-    gScore = {node.id: float('inf') for node in graph.nodeList.values()}
-    gScore[startNode.id] = 0
-
-    landmarks = findThreeBestLandmarks(startNode, endNode, landmarks)
-
-    while openSet:
-
-        if not openSet:
+        # If openList is empty, then there is no path from source to target
+        if not openList:
             return None, None, None
 
-        current = hq.heappop(openSet)[2]
-        closedSet.add(current)
+        _, _,  min_node = hq.heappop(openList)
+        visited.add(min_node)
+        openListSetId.remove(min_node.id)
 
-        if current.id == endNode.id:
+        closedListSetId.add(min_node.id)
+
+        if min_node == end:
             break
 
-        for neighbor, weight in current.adjacent.items():
-
-            if neighbor in closedSet:
+        for adj, weight in min_node.adjacent.items():
+            if adj.id in closedListSetId:
                 continue
 
-            GScore = gScore[current.id] + weight
+            # Calculate g value for current vertex(g = min_node.distance + weight)
+            g = min_node.distance + weight
 
-            if neighbor.id not in openSetIds:
-                # W'(u,v) = w(u,v) + h(u) - h(v)
-                heuristicDist = calculateFHeuristicDistance(current, neighbor, landmarks)
-                f = GScore + heuristicDist
-                gScore[neighbor.id] = GScore
-                fromSet[neighbor.id] = current
-                openSetIds.add(neighbor.id)
-                hq.heappush(openSet, (f, neighbor.id, neighbor))
+            if adj.id not in openListSetId:
+                adj.heuristicDist = calculateFHeuristicDistance(adj, end, landmarks)
+                adj._distance = g
+                adj._previous = min_node
+                f = g + adj.heuristicDist
+                hq.heappush(openList, (f, adj.id, adj))
+                openListSetId.add(adj.id)
 
             else:
-                if GScore < gScore[neighbor.id]:
-                    heuristicDist = calculateFHeuristicDistance(current, neighbor, landmarks)
-                    f = GScore + heuristicDist
-                    gScore[neighbor.id] = GScore
-                    fromSet[neighbor.id] = current
-                    for i, (fValue, id, node) in enumerate(openSet):
-                        if id == neighbor.id:
-                            openSet[i] = (f, neighbor.id, neighbor)
-                            hq.heapify(openSet)
+                if g < adj.distance:
+                    adj.distance = g
+                    adj.previous = min_node
+                    f = g + adj.heuristicDist
+                    for i, (fValue, id, node) in enumerate(openList):
+                        if id == adj.id:
+                            openList[i] = (f, adj.id, adj)
+                            hq.heapify(openList)
                             break
 
+    weight = end.distance
 
-    return calculatePath(fromSet, endNode), gScore[endNode.id], len(closedSet)
+    return calculatePath(end), weight, len(visited)
 
-def calculatePath(fromSet, endNode):
+
+def initSingleSource(graph, source):
+    for node in graph:
+        node._distance = float('inf')
+        node.heuristicDist = 0
+        node._previous = None
+    source._distance = 0
+
+def calculatePath(target):
     path = []
-    node = endNode
-    while node is not None:
-        path.append(node)
-        node = fromSet[node.id]
+    while target is not None:
+        path.append(target)
+        target = target.previous
     return path[::-1]
 
 def DijkstraNoTarget(graph, startNode):
-    '''
-    Dijkstra without a target node, instead just calculates the distance to all nodes
-    :param node:
-    :return:
-    '''
-
     startNode = graph.nodeList[startNode.id]
 
     queue = [(0, startNode.id, startNode)]

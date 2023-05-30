@@ -229,7 +229,3 @@ if __name__ == '__main__':
         times, invalidTimes = benchMarkSingleAlgo(diGraph, args.algorithm, args.amount)
         print(f"Average time for {args.algorithm}: {sum(times)/len(times)}")
         print(f"Invalid times: {invalidTimes}")
-
-        
-    
-    
