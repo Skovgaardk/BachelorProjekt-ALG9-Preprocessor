@@ -33,7 +33,6 @@ def write_DiGraph_to_file_Parquet(graph, filename):
 
 def read_DiGrapgh_from_Parquet(filename):
     start = timeit.default_timer()
-    print("got here")
     df = pd.read_parquet(filename, engine="fastparquet")
     print("Time to read graph: ", timeit.default_timer() - start)
 
