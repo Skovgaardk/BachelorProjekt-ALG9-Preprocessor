@@ -5,9 +5,9 @@ A brief description or introduction to your project.
 ## Table of Contents
 
 - [Dependencies](#dependencies)
-- [Main](#main-file)
-- [OSMPreprocessor](#preprocessor-file)
-- [Benchmark](#benchmark-file)
+- [Main](#main)
+- [OSMPreprocessor](#osmpreprocessor)
+- [Benchmark](#benchmark)
 
 
 ## Dependencies
