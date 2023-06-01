@@ -36,7 +36,7 @@ def runAlgorithm(algorithm, diGraph, startNode, endNode):
         return
 
     print("Weight of path: ", weight)
-    print("Amount of visited notes:", visited)
+    print("Amount of visited notes:", len(visited))
     print("Visualizing path in browser...")
     visualize_path(path)
 

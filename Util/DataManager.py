@@ -17,7 +17,7 @@ def write_DiGraph_to_file_Parquet(graph, filename):
                 weights.append(weight)
             super.append([node, lat, lon, adjacent, weights])
 
-        super = pd.DataFrame(super, columns=["Node", "lat", "lon", "adjacent", "weights"])
+        data = pd.DataFrame(super, columns=["Node", "lat", "lon", "adjacent", "weights"])
 
         parent_dir = "ProcessedGraphs"
 
@@ -27,7 +27,8 @@ def write_DiGraph_to_file_Parquet(graph, filename):
 
         file_path = os.path.join(parent_dir, filename + ".parquet")
 
-        super.to_parquet(file_path,engine="fastparquet")
+        data.to_parquet(file_path,engine="fastparquet")
+
 
 
 

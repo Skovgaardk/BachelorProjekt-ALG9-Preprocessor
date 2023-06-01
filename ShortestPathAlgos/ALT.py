@@ -271,7 +271,7 @@ def ALT(graph, start, end, landmarks):
 
     weight = end.distance
 
-    return calculatePath(end), weight, len(visited)
+    return calculatePath(end), weight, visited
 
 
 def initSingleSource(graph, source):

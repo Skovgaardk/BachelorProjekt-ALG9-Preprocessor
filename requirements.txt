@@ -4,6 +4,11 @@ pyarrow==12.0.0
 fastparquet==2023.4.0
 line-profiler==4.0.3
 folium==0.14.0
+matplotlib==3.7.1
+basemap==1.3.7
+basemap-data==1.3.2
+basemap-data-hires==1.3.2
+
 
 
 #matplotlib

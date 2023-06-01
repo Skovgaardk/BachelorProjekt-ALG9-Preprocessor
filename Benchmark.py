@@ -182,7 +182,6 @@ def astarHeuristicsTest(diGraph, amount):
     eucleudianTimes = []
     greedyTimes = []
 
-
     eucleudianVisitedList = []
     greedyVisitedList = []
 
@@ -210,8 +209,6 @@ def astarHeuristicsTest(diGraph, amount):
 
         if i % (amount // 10) == 0:
             print(f"{i / amount * 100:.2f}%", "of", "all", "done")
-
-
 
     print("Greedy average time: ", sum(greedyTimes)/len(greedyTimes))
     print("Eucleudian average time: ", sum(eucleudianTimes)/len(eucleudianTimes))
@@ -251,20 +248,44 @@ def searchSpaceGraph(diGraph, algorithm):
             maxNode = diGraph.nodeList[key]
 
 
-
-
     # call algorithm with the two nodes
-
+    algorithm = algorithm.lower()
     if algorithm == "dijkstra":
 
-        print("min node: ", minNode)
-        print("max node: ", maxNode)
-
-        path, weight, visited = Dijkstra.dijkstra(diGraph, minNode, maxNode)
+        path, weight, visited = Dijkstra.dijkstra(diGraph, maxNode, minNode)
 
         print("Rendering searchspace")
 
         Visualize.plot_points(path, visited)
+
+    elif algorithm == "astar":
+
+        path, weight, visited = AStar.aStar(diGraph, minNode, maxNode)
+
+        print("Rendering searchspace")
+
+        Visualize.plot_points(path, visited)
+
+    elif algorithm == "bididijkstra":
+
+        transposedGraph = Util.Graphs.transposeDiGraph(diGraph)
+
+        path, weight, visited = BiDiDijstra.biDiDijkstra(diGraph, transposedGraph, minNode, maxNode)
+
+        print("Rendering searchspace")
+
+        Visualize.plot_points(path, visited)
+
+    elif algorithm == "alt":
+
+        landmarks = ALT.findLandmarks(diGraph, 16)
+
+        path, weight, visited = ALT.ALT(diGraph, minNode, maxNode, landmarks)
+
+        print("Rendering searchspace")
+
+        Visualize.plot_points(path, visited, landmarks)
+
 
     else:
         print("Algorithm not found")

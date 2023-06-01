@@ -22,7 +22,7 @@ if __name__ == '__main__':
 
     print("Map to use: ", mapToUse)
     print("Processing map to new XML file...")
-    mapname = mapToUse[10:]
+    mapname = mapToUse[len("OSMData/"):]
     mapname = mapname[:-4]
     print("Map name: ", mapname)
     XMLhandlers.handleXML(mapToUse, "ProcessedXML/" + mapname + ".xml")
@@ -36,8 +36,6 @@ if __name__ == '__main__':
 
     print("preprocessing done!")
 
-    # Force terminate program
-    sys.exit()
 
 
 

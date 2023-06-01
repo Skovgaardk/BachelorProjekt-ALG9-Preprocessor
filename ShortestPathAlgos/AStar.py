@@ -71,7 +71,7 @@ def aStar(graph, source, target, heuristic = "euclidean"):
 
     weight = target.distance
 
-    return calculatePath(target), weight, len(visited)
+    return calculatePath(target), weight, visited
 
 
 def initSingleSource(graph, source):

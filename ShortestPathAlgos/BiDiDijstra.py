@@ -6,6 +6,9 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
     sourceNode = graph.nodeList[source.id]
     targetNode = transPosedGraph.nodeList[target.id]
 
+    visitedForwardIds = set()
+    visitedBackwardIds = set()
+
     visitedForward = set()
     visitedBackward = set()
 
@@ -21,9 +24,10 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
     while openForward and openBackward:
         ## forward search
         _, min_node_id, min_node = hq.heappop(openForward)
-        if min_node_id in visitedForward:
+        if min_node_id in visitedForwardIds:
             continue
-        visitedForward.add(min_node_id)
+        visitedForwardIds.add(min_node_id)
+        visitedForward.add(min_node)
         for adj, weight in min_node.adjacent.items():
             new_dist = forwardDist[min_node_id] + weight
             if adj.id not in forwardDist or new_dist < forwardDist[adj.id]:
@@ -33,9 +37,10 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
 
         # backward search
         _, min_node_id, min_node = hq.heappop(openBackward)
-        if min_node_id in visitedBackward:
+        if min_node_id in visitedBackwardIds:
             continue
-        visitedBackward.add(min_node_id)
+        visitedBackwardIds.add(min_node_id)
+        visitedBackward.add(min_node)
         for adj, weight in min_node.adjacent.items():
             new_dist = backwardDist[min_node_id] + weight
             if adj.id not in backwardDist or new_dist < backwardDist[adj.id]:
@@ -47,11 +52,11 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
         if not openForward or not openBackward:
             return None, None, None
 
-        if openForward[0][2].id in visitedBackward:
+        if openForward[0][2].id in visitedBackwardIds:
             intercept = openForward[0][2]
             break
 
-        if openBackward[0][2].id in visitedForward:
+        if openBackward[0][2].id in visitedForwardIds:
             intercept = openBackward[0][2]
             break
 
@@ -71,7 +76,9 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
 
     path = calculatePath(intercept, transPosedGraph, prevDictForward, prevDictBackward)
 
-    return path, weight, len(visitedForward) + len(visitedBackward)
+    totalVisited = visitedForward.union(visitedBackward)
+
+    return path, weight, totalVisited
 
 
 
