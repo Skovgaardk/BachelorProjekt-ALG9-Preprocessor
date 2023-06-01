@@ -1,13 +1,4 @@
-
-import sys
-
 import heapq as hq
-import time
-import line_profiler
-
-import Util.Graphs
-
-from collections import defaultdict
 
 
 
@@ -28,7 +19,7 @@ def biDiDijkstra(graph, transPosedGraph, source, target):
 
     intercept = None
     while openForward and openBackward:
-    ## forward search
+        ## forward search
         _, min_node_id, min_node = hq.heappop(openForward)
         if min_node_id in visitedForward:
             continue
