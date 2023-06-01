@@ -1,4 +1,5 @@
 import argparse
+import sys
 
 from Util import XMLParser, XMLhandlers, Graphs, DataManager
 
@@ -34,6 +35,9 @@ if __name__ == '__main__':
     DataManager.write_DiGraph_to_file_Parquet(diGraph, mapname)
 
     print("preprocessing done!")
+
+    # Force terminate program
+    sys.exit()
 
 
 

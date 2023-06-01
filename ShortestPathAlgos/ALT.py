@@ -102,31 +102,44 @@ def farthestLandmarks(graph, amountOfLandmarks):
 
     transPosedGraph = Graph.transposeDiGraph(graph)
 
-    startLandMark = random.choice(list(graph.nodeList.values()))
+    landmarks = []
+    unvisitedNodes = set(graph.nodeList.values())
 
-    landmarks = set()
-    landmarks.add(startLandMark)
+    firstLandmark = random.choice(list(graph.nodeList.values()))
+    landmarks.append(firstLandmark)
+    unvisitedNodes.remove(firstLandmark)
 
-    startLandMark.toLandmark = DijkstraNoTarget(transPosedGraph, startLandMark)
-    startLandMark.fromLandmark = DijkstraNoTarget(graph, startLandMark)
+    firstLandmark.fromLandmark = DijkstraNoTarget(graph, firstLandmark)
+    firstLandmark.toLandmark = DijkstraNoTarget(transPosedGraph, firstLandmark)
 
-    for i in range(amountOfLandmarks):
+    for i in range(amountOfLandmarks - 1):
+        farthestNode = None
+        maxDistance = 0
 
-        maxDist = 0
-        maxNode = None
+        for node in unvisitedNodes:
+            minDistance = float('inf')
+            for landmark in landmarks:
+                distance = landmark.fromLandmark[node.id]
+                if distance < minDistance:
+                    minDistance = distance
 
-        for landmark in landmarks:
-            toLandMarkDist = landmark.toLandmark
-            for dist in toLandMarkDist.values():
-                if dist > maxDist:
-                    maxDist = dist
-                    maxNode = landmark
+            if minDistance > maxDistance:
+                maxDistance = minDistance
+                farthestNode = node
 
-        maxNode.fromLandmark = DijkstraNoTarget(graph, maxNode)
-        maxNode.toLandmark = DijkstraNoTarget(transPosedGraph, maxNode)
-        landmarks.add(maxNode)
+
+        # Edge case where there is no path to the node
+        if farthestNode is None:
+            farthestNode = random.choice(list(unvisitedNodes))
+
+
+        farthestNode.fromLandmark = DijkstraNoTarget(graph, farthestNode)
+        farthestNode.toLandmark = DijkstraNoTarget(transPosedGraph, farthestNode)
+        landmarks.append(farthestNode)
+        unvisitedNodes.remove(farthestNode)
 
     return landmarks
+
 
 def findLandmarks(graph, amountOfLandmarks, heuristic="quadrants"):
 
@@ -138,9 +151,10 @@ def findLandmarks(graph, amountOfLandmarks, heuristic="quadrants"):
         return landmarks
     elif heuristic == "farthest":
         landmarks = farthestLandmarks(graph, amountOfLandmarks)
-        print("landmarks returned:")
-        for landmark in landmarks:
-            print(landmark.id)
+        return landmarks
+    else:
+        print("No such heuristic, defaulting to quadrants")
+        landmarks = quadrantLandmarks(graph, amountOfLandmarks)
         return landmarks
 
 
@@ -162,6 +176,10 @@ def findBestLowerBound(node, target, landmarks):
 
 
 def findThreeBestLandmarks(startNode, endNode, landmarks):
+
+    #Check of there are more than 3 landmarks
+    if len(landmarks) <= 3:
+        return landmarks
 
     bestLandmarks = []
 

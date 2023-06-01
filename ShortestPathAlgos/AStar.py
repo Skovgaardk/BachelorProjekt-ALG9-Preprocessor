@@ -10,6 +10,7 @@
 """
 
 import heapq as hq
+import math
 from math import sin, cos, sqrt, atan2, radians
 
 
@@ -104,9 +105,12 @@ def calculateHeuristicDist(source, target, heuristic):
 
         return R * c
     elif heuristic == "greedy":
-        dx = abs(source.lat - target.lat)
-        dy = abs(source.lon - target.lon)
-        return sqrt(dx * dx + dy * dy)
+        dx = source.lat - target.lat
+        dy = source.lon - target.lon
+        distance = math.sqrt(dx * dx + dy * dy)
+        return distance
+    else:
+        raise Exception("Unknown heuristic")
 
 
 

@@ -95,6 +95,15 @@ class DiGraph:
                 distance = self.calculateDistance(nodeLat, nodeLon, neighborLat, neighborLon)
                 self.nodeList[node].adjacent[neighbor] = distance
 
+    def countNodes(self):
+        return len(self.nodeList)
+
+    def countEdges(self):
+        count = 0
+        for node in self.nodeList:
+            count += len(self.nodeList[node].adjacent)
+        return count
+
 
 def printDiGraph(diGraph):
     for node in diGraph.nodeList:
